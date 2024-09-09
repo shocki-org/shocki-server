@@ -12,3 +12,32 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum Provider {
+  GOOGLE
+  KAKAO
+  EMAIL
+}
+
+model User {
+  id         String    @id @default(uuid())
+  provider   Provider
+  providerId String?
+  email      String?
+  password   String?
+  Address    Address[]
+}
+
+model Address {
+  id      String @id @default(uuid())
+  userId  String
+  user    User   @relation(fields: [userId], references: [id])
+  name    String
+  phone   String // +821012345678
+  address String // TODO: 세분화
+}
+
+model Category {
+  id   String @id @default(uuid())
+  name String @unique
+}
