@@ -16,14 +16,13 @@ datasource db {
 enum Provider {
   GOOGLE
   KAKAO
-  EMAIL
+  PHONE
 }
 
 model User {
   id         String       @id @default(uuid())
   provider   Provider
-  providerId String?
-  phone      String?
+  providerId String
   password   String?
   Address    Address[]
   Alert      Alert[]
