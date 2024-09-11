@@ -25,6 +25,14 @@ class EnvironmentVariables {
   @IsString()
   @IsNotEmpty()
   AWS_SNS_REGION: string;
+
+  @IsString()
+  @IsNotEmpty()
+  REDIS_HOST: string;
+
+  @IsString()
+  @IsNotEmpty()
+  REDIS_PORT: string;
 }
 
 export function validate(config: Record<string, unknown>) {
