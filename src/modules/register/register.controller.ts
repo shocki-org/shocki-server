@@ -9,7 +9,6 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
-import { AuthService } from './auth.service';
 import { OAuthDTO, OAuthResponseDTO } from './dto/oauth.dto';
 import {
   PhoneRegisterFinalDTO,
@@ -17,10 +16,11 @@ import {
   PhoneRegisterSecondDTO,
   PhoneRegisterSecondResponseDTO,
 } from './dto/phone.register.dto';
+import { RegisterService } from './register.service';
 
-@Controller('auth')
-export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+@Controller('register')
+export class RegisterController {
+  constructor(private readonly registerService: RegisterService) {}
 
   @Post('login')
   @ApiBody({
@@ -34,12 +34,12 @@ export class AuthController {
     description: 'User password is not set (Phone) or Internal server error',
   })
   async login(@Body() dto: OAuthDTO) {
-    const token = await this.authService.login(dto);
+    const token = await this.registerService.login(dto);
 
     return { token };
   }
 
-  @Post('register/phone/first')
+  @Post('phone/first')
   @ApiBody({
     type: PhoneRegisterFirstDTO,
   })
@@ -47,12 +47,12 @@ export class AuthController {
   @ApiOkResponse({ description: 'Success' })
   @ApiConflictResponse({ description: 'Phone number already exists' })
   async phoneRegisterFirst(@Body() dto: PhoneRegisterFirstDTO) {
-    await this.authService.phoneRegisterFirst(dto);
+    await this.registerService.phoneRegisterFirst(dto);
 
     return true;
   }
 
-  @Post('register/phone/second')
+  @Post('phone/second')
   @ApiBody({
     type: PhoneRegisterSecondDTO,
   })
@@ -60,12 +60,12 @@ export class AuthController {
   @ApiOkResponse({ description: 'Success', type: PhoneRegisterSecondResponseDTO })
   @ApiUnauthorizedResponse({ description: 'OTP is invalid' })
   async phoneRegisterSecond(@Body() dto: PhoneRegisterSecondDTO) {
-    const token = await this.authService.phoneRegisterSecond(dto);
+    const token = await this.registerService.phoneRegisterSecond(dto);
 
     return { token };
   }
 
-  @Post('register/phone/final')
+  @Post('phone/final')
   @ApiBody({
     type: PhoneRegisterFinalDTO,
   })
@@ -74,7 +74,7 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: 'OTP is invalid' })
   @ApiConflictResponse({ description: 'Phone number already exists' })
   async phoneRegisterFinal(@Body() dto: PhoneRegisterFinalDTO) {
-    const token = await this.authService.phoneRegisterFinal(dto);
+    const token = await this.registerService.phoneRegisterFinal(dto);
 
     return { token };
   }

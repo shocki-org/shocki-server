@@ -28,11 +28,6 @@ export class PhoneRegisterSecondResponseDTO {
   token: string;
 }
 
-export interface PhoneRegisterJWTPayload {
-  phone: string;
-  type: 'phone';
-}
-
 export class PhoneRegisterFinalDTO {
   @IsString()
   @IsNotEmpty()
