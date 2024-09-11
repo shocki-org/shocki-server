@@ -15,4 +15,4 @@ const options: ConfigModuleOptions = {
 @Module({
   imports: [ConfigModule.forRoot(options)],
 })
-export class ADEGOConfigModule {}
+export class ShockiConfigModule {}
