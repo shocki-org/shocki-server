@@ -13,6 +13,14 @@ class EnvironmentVariables {
   @IsString()
   @IsNotEmpty()
   JWT_ACCESS_TOKEN_EXP: string;
+
+  @IsString()
+  @IsNotEmpty()
+  AWS_ACCESS_ID: string;
+
+  @IsString()
+  @IsNotEmpty()
+  AWS_SECRET_KEY: string;
 }
 
 export function validate(config: Record<string, unknown>) {
