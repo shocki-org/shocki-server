@@ -2,18 +2,28 @@ import { Provider } from '@prisma/client';
 import { compare, hash } from 'bcrypt';
 import { OAuth2Client } from 'google-auth-library';
 
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import {
+  ConflictException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 
+import { SnsService } from 'src/common/modules/aws/sns/sns.service';
 import { PrismaService } from 'src/common/modules/prisma/prisma.service';
 
 import { OAuthDTO } from './dto/oauth.dto';
+import {
+  PhoneRegisterFinalDTO,
+  PhoneRegisterFirstDTO,
+  PhoneRegisterJWTPayload,
+  PhoneRegisterSecondDTO,
+} from './dto/phone.register.dto';
 import { KakaoUser } from './model/kakao.user.model';
 import { OauthUser } from './model/oauth.user.model';
 import { JwtPayload } from './model/payload.jwt.model';
@@ -25,6 +35,8 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly snsService: SnsService,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {
     this.oAuth2Client = new OAuth2Client();
   }
@@ -54,6 +66,50 @@ export class AuthService {
       secret: this.configService.get<string>('JWT_SECRET'),
       expiresIn: this.configService.get<string>('JWT_ACCESS_TOKEN_EXP'),
     });
+  }
+
+  async phoneRegisterFirst(dto: PhoneRegisterFirstDTO) {
+    const user = await this.findUserByProvider(Provider.PHONE, dto.phone);
+    if (user) throw new ConflictException('Phone number already exists');
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    await this.cacheManager.set(dto.phone, otp, 180000); // 3 minutes
+    await this.snsService.sendSMS(dto.phone, `[Shocki] 인증번호 [${otp}]를 입력해주세요.`);
+  }
+
+  async phoneRegisterSecond(dto: PhoneRegisterSecondDTO) {
+    const otp = await this.cacheManager.get<string>(dto.phone);
+
+    if (!otp) throw new UnauthorizedException('OTP expired');
+    if (otp !== dto.otp) throw new UnauthorizedException('OTP is incorrect');
+
+    await this.cacheManager.del(dto.phone);
+
+    const payload: PhoneRegisterJWTPayload = { phone: dto.phone, type: 'phone' };
+    return await this.jwtService.signAsync(payload, {
+      secret: this.configService.get<string>('JWT_SECRET'),
+      expiresIn: this.configService.get<string>('JWT_ACCESS_TOKEN_EXP'),
+    });
+  }
+
+  async phoneRegisterFinal(dto: PhoneRegisterFinalDTO) {
+    let payload: PhoneRegisterJWTPayload;
+    try {
+      payload = await this.jwtService.verifyAsync<PhoneRegisterJWTPayload>(dto.token, {
+        secret: this.configService.get<string>('JWT_SECRET'),
+      });
+    } catch (e: any) {
+      if (e instanceof TokenExpiredError) throw new UnauthorizedException('Token expired');
+      throw new UnauthorizedException('Token is invalid');
+    }
+
+    const user = await this.findUserByProvider(Provider.PHONE, payload.phone);
+    if (user) throw new ConflictException('Phone number already exists');
+
+    return this.createUser(Provider.PHONE, payload.phone, dto.password).then((registeredUser) =>
+      this.createTokens(registeredUser.id),
+    );
   }
 
   async login(dto: OAuthDTO) {
