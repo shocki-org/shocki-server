@@ -27,6 +27,7 @@ model User {
   Address    Address[]
   Alert      Alert[]
   ProductQnA ProductQnA[]
+  FundingLog FundingLog[]
 }
 
 model Address {
@@ -71,6 +72,17 @@ model Product {
   collectedAmount Int
   fundingEndDate  Int
   ProductQnA      ProductQnA[]
+  FundingLog      FundingLog[]
+}
+
+model FundingLog {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  amount    Int
+  createdAt DateTime @default(now())
 }
 
 model ProductCategory {
