@@ -10,14 +10,19 @@ export class OAuthDTO {
   provider: Provider;
 
   @IsString()
-  @ApiProperty()
+  @ApiProperty({ required: false, nullable: true })
   accessToken?: string;
 
   @IsString()
-  @ApiProperty()
+  @ApiProperty({ required: false, nullable: true })
   phone?: string;
 
   @IsString()
-  @ApiProperty()
+  @ApiProperty({ required: false, nullable: true })
   password?: string;
+}
+
+export class OAuthResponseDTO {
+  @ApiProperty()
+  accessToken: string;
 }
