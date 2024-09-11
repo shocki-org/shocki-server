@@ -21,6 +21,10 @@ class EnvironmentVariables {
   @IsString()
   @IsNotEmpty()
   AWS_SECRET_KEY: string;
+
+  @IsString()
+  @IsNotEmpty()
+  AWS_SNS_REGION: string;
 }
 
 export function validate(config: Record<string, unknown>) {
