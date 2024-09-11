@@ -16,7 +16,7 @@ export class SnsService {
   }
 
   sendSMS(phoneNumber: string, message: string) {
-    const params: AWS.SNS.PublishInput = {
+    const params: SNS.PublishInput = {
       Message: message,
       PhoneNumber: phoneNumber,
     };
