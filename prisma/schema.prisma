@@ -29,6 +29,7 @@ model User {
   productQnA  ProductQnA[]
   fundingLog  FundingLog[]
   UserAccount UserAccount?
+  Product     Product[]
 }
 
 model UserAccount {
@@ -72,6 +73,8 @@ enum ProductType {
 
 model Product {
   id                         String                       @id @default(uuid())
+  ownerId                    String
+  user                       User                         @relation(fields: [ownerId], references: [id])
   name                       String
   image                      String
   detailImage                String
