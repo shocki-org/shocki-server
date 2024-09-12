@@ -14,6 +14,7 @@ export class ProductService {
         data: {
           name: '상품 이름',
           image: '상품 이미지 URL',
+          detailImage: '상세 이미지 URL',
           type: 'FUNDING',
           currentAmount: 13000,
           targetAmount: 20000,

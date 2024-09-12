@@ -12,6 +12,9 @@ export class ProductDTO implements Product {
   @ApiProperty({ description: '상품 이미지 URL' })
   image: string;
 
+  @ApiProperty({ description: '상세 이미지 URL' })
+  detailImage: string;
+
   @ApiProperty({ enum: $Enums.ProductType })
   type: $Enums.ProductType;
 
