@@ -14,17 +14,17 @@ class EnvironmentVariables {
   @IsNotEmpty()
   JWT_ACCESS_TOKEN_EXP: string;
 
-  @IsString()
-  @IsNotEmpty()
-  AWS_ACCESS_ID: string;
+  // @IsString()
+  // @IsNotEmpty()
+  // AWS_ACCESS_ID: string;
 
-  @IsString()
-  @IsNotEmpty()
-  AWS_SECRET_KEY: string;
+  // @IsString()
+  // @IsNotEmpty()
+  // AWS_SECRET_KEY: string;
 
-  @IsString()
-  @IsNotEmpty()
-  AWS_SNS_REGION: string;
+  // @IsString()
+  // @IsNotEmpty()
+  // AWS_SNS_REGION: string;
 
   @IsString()
   @IsNotEmpty()
@@ -33,6 +33,18 @@ class EnvironmentVariables {
   @IsString()
   @IsNotEmpty()
   REDIS_PORT: string;
+
+  @IsString()
+  @IsNotEmpty()
+  COOLSMS_API_KEY: string;
+
+  @IsString()
+  @IsNotEmpty()
+  COOLSMS_API_SECRET: string;
+
+  @IsString()
+  @IsNotEmpty()
+  COOLSMS_SENDER: string;
 }
 
 export function validate(config: Record<string, unknown>) {
