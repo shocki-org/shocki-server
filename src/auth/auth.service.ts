@@ -14,7 +14,13 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService<
+      {
+        JWT_SECRET: string;
+        JWT_ACCESS_TOKEN_EXP: string;
+      },
+      true
+    >,
   ) {}
 
   async findUserByProvider(provider: Provider, providerId: string) {
@@ -43,16 +49,16 @@ export class AuthService {
   async createTokens(userId: string) {
     const payload: JwtPayload = { id: userId, type: 'access' };
     return await this.jwtService.signAsync(payload, {
-      secret: this.configService.get<string>('JWT_SECRET'),
-      expiresIn: this.configService.get<string>('JWT_ACCESS_TOKEN_EXP'),
+      secret: this.configService.get('JWT_SECRET'),
+      expiresIn: this.configService.get('JWT_ACCESS_TOKEN_EXP'),
     });
   }
 
   async createPhoneTmpToken(phone: string) {
     const payload: PhoneRegisterJWTPayload = { phone: phone, type: 'phone' };
     return await this.jwtService.signAsync(payload, {
-      secret: this.configService.get<string>('JWT_SECRET'),
-      expiresIn: this.configService.get<string>('JWT_PHONE_TMP_TOKEN_EXP'),
+      secret: this.configService.get('JWT_SECRET'),
+      expiresIn: this.configService.get('JWT_ACCESS_TOKEN_EXP'),
     });
   }
 
