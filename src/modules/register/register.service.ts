@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 
 import { AuthService } from 'src/auth/auth.service';
-import { SnsService } from 'src/common/modules/aws/sns/sns.service';
+import { CoolsmsService } from 'src/common/modules/coolsms/coolsms.service';
 
 import { OAuthDTO } from './dto/oauth.dto';
 import {
@@ -27,7 +27,7 @@ import { OauthUser } from './model/oauth.user.model';
 export class RegisterService {
   private readonly oAuth2Client: OAuth2Client;
   constructor(
-    private readonly snsService: SnsService,
+    private readonly coolsmsService: CoolsmsService,
     private readonly authService: AuthService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {
@@ -40,7 +40,7 @@ export class RegisterService {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     await this.cacheManager.set(dto.phone, otp, 180000); // 3 minutes
-    await this.snsService.sendSMS(dto.phone, `[Shocki] 인증번호 [${otp}]를 입력해주세요.`);
+    await this.coolsmsService.sendSMS(dto.phone, `[Shocki] 인증번호 [${otp}]를 입력해주세요.`);
   }
 
   async phoneRegisterSecond(dto: PhoneRegisterSecondDTO) {
