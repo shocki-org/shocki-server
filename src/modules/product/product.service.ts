@@ -8,7 +8,7 @@ import { PrismaService } from 'src/common/modules/prisma/prisma.service';
 export class ProductService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createTestProduct() {
+  async createTestProduct(userId: string) {
     return this.prisma.product
       .create({
         data: {
@@ -25,7 +25,7 @@ export class ProductService {
                 amount: 10000,
                 user: {
                   connect: {
-                    id: 'ef129d4f-ebfd-4c33-8786-c1e3dc0b4012',
+                    id: userId,
                   },
                 },
                 createdAt: DateTime.now().minus({ days: 1 }).toJSDate(),
@@ -34,7 +34,7 @@ export class ProductService {
                 amount: 13000,
                 user: {
                   connect: {
-                    id: 'ef129d4f-ebfd-4c33-8786-c1e3dc0b4012',
+                    id: userId,
                   },
                 },
                 createdAt: DateTime.now().toJSDate(),
@@ -48,7 +48,7 @@ export class ProductService {
                 authorType: 'BUYER',
                 user: {
                   connect: {
-                    id: 'ef129d4f-ebfd-4c33-8786-c1e3dc0b4012',
+                    id: userId,
                   },
                 },
               },
@@ -57,7 +57,7 @@ export class ProductService {
                 authorType: 'SELLER',
                 user: {
                   connect: {
-                    id: 'ef129d4f-ebfd-4c33-8786-c1e3dc0b4012',
+                    id: userId,
                   },
                 },
               },
