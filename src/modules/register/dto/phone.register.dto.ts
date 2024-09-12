@@ -5,19 +5,25 @@ import { ApiProperty } from '@nestjs/swagger';
 export class PhoneRegisterFirstDTO {
   @IsString()
   @IsNotEmpty()
-  @ApiProperty()
+  @ApiProperty({
+    example: '+821012345678',
+  })
   phone: string;
 }
 
 export class PhoneRegisterSecondDTO {
   @IsString()
   @IsNotEmpty()
-  @ApiProperty()
+  @ApiProperty({
+    example: '+821012345678',
+  })
   phone: string;
 
   @IsString()
   @IsNotEmpty()
-  @ApiProperty()
+  @ApiProperty({
+    example: '000000',
+  })
   otp: string;
 }
 
