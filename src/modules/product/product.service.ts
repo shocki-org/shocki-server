@@ -12,6 +12,11 @@ export class ProductService {
     return this.prisma.product
       .create({
         data: {
+          user: {
+            connect: {
+              id: userId,
+            },
+          },
           name: '상품 이름',
           image: '상품 이미지 URL',
           detailImage: '상세 이미지 URL',
