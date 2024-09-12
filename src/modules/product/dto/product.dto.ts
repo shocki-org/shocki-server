@@ -6,6 +6,9 @@ export class ProductDTO implements Product {
   @ApiProperty({ description: '상품 ID' })
   id: string;
 
+  @ApiProperty({ description: '상품 소유자 ID' })
+  ownerId: string;
+
   @ApiProperty({ description: '상품 이름' })
   name: string;
 
