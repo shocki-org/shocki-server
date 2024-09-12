@@ -58,7 +58,7 @@ export class AuthService {
     const payload: PhoneRegisterJWTPayload = { phone: phone, type: 'phone' };
     return await this.jwtService.signAsync(payload, {
       secret: this.configService.get('JWT_SECRET'),
-      expiresIn: this.configService.get('JWT_ACCESS_TOKEN_EXP'),
+      expiresIn: '10m',
     });
   }
 
