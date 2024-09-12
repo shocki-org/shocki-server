@@ -20,14 +20,23 @@ enum Provider {
 }
 
 model User {
-  id         String       @id @default(uuid())
-  provider   Provider
-  providerId String
-  password   String?
-  Address    Address[]
-  Alert      Alert[]
-  productQnA ProductQnA[]
-  fundingLog FundingLog[]
+  id          String       @id @default(uuid())
+  provider    Provider
+  providerId  String
+  password    String?
+  Address     Address[]
+  Alert       Alert[]
+  productQnA  ProductQnA[]
+  fundingLog  FundingLog[]
+  UserAccount UserAccount?
+}
+
+model UserAccount {
+  id                         String                       @id @default(uuid())
+  userId                     String                       @unique
+  user                       User                         @relation(fields: [userId], references: [id])
+  credit                     Int                          @default(0)
+  UserTokenBalancesOnProduct UserTokenBalancesOnProduct[]
 }
 
 model Address {
@@ -62,21 +71,22 @@ enum ProductType {
 }
 
 model Product {
-  id              String                @id @default(uuid())
-  name            String
-  image           String
-  type            ProductType
-  currentAmount   Int
-  targetAmount    Int
-  collectedAmount Int
-  fundingEndDate  DateTime
-  productQnA      ProductQnA[]
-  fundingLog      FundingLog[]
-  categories      CategoriesOnProduct[]
+  id                         String                       @id @default(uuid())
+  name                       String
+  image                      String
+  type                       ProductType
+  currentAmount              Int
+  targetAmount               Int
+  collectedAmount            Int
+  fundingEndDate             DateTime
+  productQnA                 ProductQnA[]
+  fundingLog                 FundingLog[]
+  categories                 CategoriesOnProduct[]
+  UserTokenBalancesOnProduct UserTokenBalancesOnProduct[]
 }
 
 model FundingLog {
-  id        String   @id @default(uuid())
+  id        Int      @id @default(autoincrement())
   productId String
   product   Product  @relation(fields: [productId], references: [id])
   userId    String
@@ -109,4 +119,14 @@ model ProductQnA {
   user       User                 @relation(fields: [authorId], references: [id])
   content    String
   createdAt  DateTime             @default(now())
+}
+
+model UserTokenBalancesOnProduct {
+  id            String      @id @default(uuid())
+  userAccountId String
+  userAccount   UserAccount @relation(fields: [userAccountId], references: [id])
+  productId     String
+  product       Product     @relation(fields: [productId], references: [id])
+  token         Int         @default(0)
+  createdAt     DateTime    @default(now())
 }
