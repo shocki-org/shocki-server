@@ -20,4 +20,7 @@ jobs:
           timeout: 30s
           script: |
             cd /root/shocki-server
-            ./deploy.sh
+            git pull origin main
+            pnpm i
+            export DATABASE_URL=${{ secrets.DATABASE_URL }} pnpx prisma generate
+            docker compose up -d --build
