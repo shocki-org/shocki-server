@@ -6,6 +6,7 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
@@ -19,6 +20,7 @@ import {
 import { RegisterService } from './register.service';
 
 @Controller('register')
+@ApiTags('Register')
 export class RegisterController {
   constructor(private readonly registerService: RegisterService) {}
 

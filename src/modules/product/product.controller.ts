@@ -4,15 +4,15 @@ import {
   ApiBearerAuth,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
 import { GetProductDTO } from './dto/get.product.dto';
-// import { JwtPayload } from 'src/auth/model/payload.jwt.model';
-// import { CurrentUser } from 'src/common';
 import { ProductService } from './product.service';
 
 @Controller('product')
+@ApiTags('Product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
