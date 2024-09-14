@@ -19,6 +19,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           timeout: 30s
           script: |
+            source ~/.bashrc
             cd /root/shocki-server
             git pull origin main
             pnpm i
