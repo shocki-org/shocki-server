@@ -1,0 +1,23 @@
+name: React build apple
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  React-Build-ssh-action:
+    runs-on: ubuntu-latest
+    name: Build
+    steps:
+      - name: SSH Remote Commands
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          timeout: 30s
+          script: |
+            cd /root/shocki-server
+            ./deploy.sh
