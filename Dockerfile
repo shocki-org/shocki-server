@@ -1,4 +1,4 @@
-FROM node:20-alpine AS builder
+FROM node:20 AS builder
 
 LABEL maintainer="https://suk.kr"
 
@@ -12,7 +12,7 @@ COPY . /app
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
 RUN pnpm run build
 
-FROM node:20-alpine
+FROM node:20
 
 ENV TZ=Asia/Seoul
 ENV PNPM_HOME="/pnpm"
