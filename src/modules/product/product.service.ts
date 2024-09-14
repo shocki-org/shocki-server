@@ -128,4 +128,12 @@ export class ProductService {
         throw new NotFoundException(error.message);
       });
   }
+
+  // async buyProductToken(userId: string, productId: string, amount: number) {}
+
+  // async sellProductToken(userId: string, productId: string, amount: number) {}
+
+  // async createProductQnA(userId: string, productId: string, content: string) {}
+
+  // async createProductQnAReply(userId: string, productId: string, content: string) {}
 }
