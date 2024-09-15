@@ -78,7 +78,7 @@ model Product {
   name                       String
   image                      String
   detailImage                String
-  type                       ProductType
+  type                       ProductType                  @default(FUNDING)
   currentAmount              Int
   targetAmount               Int
   collectedAmount            Int
