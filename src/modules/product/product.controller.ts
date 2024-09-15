@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Put, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBadRequestResponse,
@@ -28,7 +28,7 @@ export class ProductController {
   @ApiOkResponse({ description: 'Product', type: GetProductDTO })
   @ApiNotFoundResponse({ description: 'Product not found' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async getProduct(@Param('id') id: string) {
+  async getProduct(@Query('id') id: string) {
     return this.productService.getProduct(id);
   }
 
@@ -57,20 +57,20 @@ export class ProductController {
     return this.productService.getProducts(id);
   }
 
-  @Put('favorite/:productId')
+  @Put('favorite')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('access'))
   @ApiOkResponse({ description: 'Success' })
   @ApiNotFoundResponse({ description: 'Product not found' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBadRequestResponse({ description: 'Already favorited' })
-  async favoriteProduct(@CurrentUser() { id }: JwtPayload, @Param('productId') productId: string) {
+  async favoriteProduct(@CurrentUser() { id }: JwtPayload, @Query('productId') productId: string) {
     await this.productService.favoriteProduct(id, productId);
 
     return { success: true };
   }
 
-  @Put('unfavorite/:productId')
+  @Put('unfavorite')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('access'))
   @ApiOkResponse({ description: 'Success' })
@@ -79,7 +79,7 @@ export class ProductController {
   @ApiBadRequestResponse({ description: 'Already unfavorited' })
   async unfavoriteProduct(
     @CurrentUser() { id }: JwtPayload,
-    @Param('productId') productId: string,
+    @Query('productId') productId: string,
   ) {
     await this.productService.unfavoriteProduct(id, productId);
 
