@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Put, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
   ApiNotFoundResponse,
@@ -44,5 +45,44 @@ export class ProductController {
     const res = await this.productService.createProduct(id, dto);
 
     return { productId: res.id };
+  }
+
+  @Get('list')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('access'))
+  @ApiOkResponse({ description: 'Product list', type: [GetProductDTO] })
+  @ApiNotFoundResponse({ description: 'Products not found' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  async getProductList(@CurrentUser() { id }: JwtPayload) {
+    return this.productService.getProducts(id);
+  }
+
+  @Get('favorite/:productId')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('access'))
+  @ApiOkResponse({ description: 'Success' })
+  @ApiNotFoundResponse({ description: 'Product not found' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiBadRequestResponse({ description: 'Already favorited' })
+  async favoriteProduct(@CurrentUser() { id }: JwtPayload, @Param('productId') productId: string) {
+    await this.productService.favoriteProduct(id, productId);
+
+    return { success: true };
+  }
+
+  @Get('unfavorite/:productId')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('access'))
+  @ApiOkResponse({ description: 'Success' })
+  @ApiNotFoundResponse({ description: 'Product not found' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiBadRequestResponse({ description: 'Already unfavorited' })
+  async unfavoriteProduct(
+    @CurrentUser() { id }: JwtPayload,
+    @Param('productId') productId: string,
+  ) {
+    await this.productService.unfavoriteProduct(id, productId);
+
+    return { success: true };
   }
 }

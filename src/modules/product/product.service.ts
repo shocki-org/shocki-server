@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from 'src/common/modules/prisma/prisma.service';
 
@@ -160,6 +160,57 @@ export class ProductService {
       })
       .catch((error) => {
         throw new NotFoundException(error.message);
+      });
+  }
+
+  async getProducts(userId: string) {
+    return this.prisma.product.findMany({
+      include: {
+        userFavorite: {
+          select: {
+            userId: true,
+          },
+          where: {
+            userId: userId,
+          },
+        },
+      },
+    });
+  }
+
+  async favoriteProduct(userId: string, productId: string) {
+    return this.prisma.userFavorite
+      .create({
+        data: {
+          user: {
+            connect: {
+              id: userId,
+            },
+          },
+          product: {
+            connect: {
+              id: productId,
+            },
+          },
+        },
+      })
+      .catch(() => {
+        throw new BadRequestException('이미 찜한 상품입니다.');
+      });
+  }
+
+  async unfavoriteProduct(userId: string, productId: string) {
+    return this.prisma.userFavorite
+      .delete({
+        where: {
+          userId_productId: {
+            userId,
+            productId,
+          },
+        },
+      })
+      .catch(() => {
+        throw new BadRequestException('찜한 상품이 아닙니다.');
       });
   }
 
