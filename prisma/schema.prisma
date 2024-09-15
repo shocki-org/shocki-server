@@ -20,17 +20,17 @@ enum Provider {
 }
 
 model User {
-  id           String         @id @default(uuid())
-  provider     Provider
-  providerId   String
-  password     String?
-  address      Address[]
-  alert        Alert[]
-  productQnA   ProductQnA[]
-  fundingLog   FundingLog[]
-  userAccount  UserAccount?
-  product      Product[]
-  userFavorite UserFavorite[]
+  id               String         @id @default(uuid())
+  provider         Provider
+  providerId       String
+  password         String?
+  address          Address[]
+  alert            Alert[]
+  productQnA       ProductQnA[]
+  fundingLog       FundingLog[]
+  userAccount      UserAccount?
+  product          Product[]
+  favoriteProducts UserFavorite[]
 }
 
 model UserAccount {
@@ -42,11 +42,12 @@ model UserAccount {
 }
 
 model UserFavorite {
-  id        String  @id @default(uuid())
   userId    String
   user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([userId, productId])
 }
 
 model Address {
@@ -96,7 +97,7 @@ model Product {
   fundingLog                 FundingLog[]
   categories                 CategoriesOnProduct[]
   userTokenBalancesOnProduct UserTokenBalancesOnProduct[]
-  UserFavorite               UserFavorite[]
+  userFavorite               UserFavorite[]
 }
 
 model FundingLog {
