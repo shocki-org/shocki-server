@@ -13,6 +13,7 @@ import { JwtPayload } from 'src/auth/model/payload.jwt.model';
 import { CurrentUser } from 'src/common';
 
 import { AlertService } from './alert.service';
+import { AlertDTO } from './dto/get.alert.dto';
 
 @Controller('alert')
 @ApiTags('Alert')
@@ -23,7 +24,7 @@ export class AlertController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('access'))
   @ApiOperation({ summary: '알림 리스트 가져오기' })
-  @ApiOkResponse({ description: 'Success' })
+  @ApiOkResponse({ description: 'Success', type: [AlertDTO] })
   @ApiNotFoundResponse({ description: 'Alert not found' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async getAlerts(@CurrentUser() { id }: JwtPayload) {
