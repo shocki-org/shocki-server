@@ -66,14 +66,21 @@ model Category {
   categoriesOnProduct CategoriesOnProduct[]
 }
 
+enum AlertType {
+  INFO
+  PAYBACK
+  FAILURE
+  SYSTEM
+}
+
 model Alert {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   title     String
   content   String
-  type      Int
-  createdAt DateTime @default(now())
+  type      AlertType
+  createdAt DateTime  @default(now())
 }
 
 enum ProductType {
