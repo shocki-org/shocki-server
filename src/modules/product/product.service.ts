@@ -133,6 +133,11 @@ export class ProductService {
           id: productId,
         },
         include: {
+          userFavorite: {
+            select: {
+              userId: true,
+            },
+          },
           fundingLog: {
             select: {
               amount: true,
@@ -158,24 +163,37 @@ export class ProductService {
           },
         },
       })
+      .then((product) => {
+        return {
+          ...product,
+          userFavorite: !!product.userFavorite.length,
+        };
+      })
       .catch((error) => {
         throw new NotFoundException(error.message);
       });
   }
 
   async getProducts(userId: string) {
-    return this.prisma.product.findMany({
-      include: {
-        userFavorite: {
-          select: {
-            userId: true,
-          },
-          where: {
-            userId: userId,
+    return this.prisma.product
+      .findMany({
+        include: {
+          userFavorite: {
+            select: {
+              userId: true,
+            },
+            where: {
+              userId: userId,
+            },
           },
         },
-      },
-    });
+      })
+      .then((product) => {
+        return product.map((product) => ({
+          ...product,
+          userFavorite: !!product.userFavorite.length,
+        }));
+      });
   }
 
   async favoriteProduct(userId: string, productId: string) {

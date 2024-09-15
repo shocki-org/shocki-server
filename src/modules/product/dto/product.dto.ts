@@ -1,4 +1,4 @@
-import { $Enums, Category, FundingLog, Product, ProductQnA } from '@prisma/client';
+import { $Enums, Category, FundingLog, Product, ProductQnA, UserFavorite } from '@prisma/client';
 
 import { ApiProperty } from '@nestjs/swagger';
 

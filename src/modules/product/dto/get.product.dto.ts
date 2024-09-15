@@ -11,4 +11,10 @@ export class GetProductDTO extends ProductDTO {
 
   @ApiProperty({ description: '카테고리', type: [ProductCategoryDTO] })
   categories: ProductCategoryDTO[];
+
+  @ApiProperty({
+    description: '찜',
+    type: Boolean,
+  })
+  userFavorite: boolean;
 }
