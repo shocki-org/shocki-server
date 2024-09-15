@@ -19,7 +19,6 @@ const config: HardhatUserConfig = {
   networks: {
     minato: {
       url: 'https://soneium-minato.rpc.scs.startale.com/?apikey=BFlJo8vAg4VBibKgfmKBvItDiUoQrHxg',
-      accounts: ['0x5cC6324aB61Be6425127F0B46Cf2c87AcE6b3514'],
     },
   },
   etherscan: {
