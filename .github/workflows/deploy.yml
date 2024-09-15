@@ -19,7 +19,8 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           timeout: 30s
           script: |
-            source ~/.bashrc
+            export NVM_DIR=~/.nvm
+            source ~/.nvm/nvm.sh
             cd /root/shocki-server
             git pull origin main
             pnpm i
