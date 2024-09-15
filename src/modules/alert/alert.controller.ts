@@ -5,6 +5,7 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
@@ -14,6 +15,7 @@ import { CurrentUser } from 'src/common';
 import { AlertService } from './alert.service';
 
 @Controller('alert')
+@ApiTags('Alert')
 export class AlertController {
   constructor(private readonly alertService: AlertService) {}
 
