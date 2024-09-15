@@ -30,8 +30,8 @@ export class ProductController {
   @ApiOkResponse({ description: 'Product', type: GetProductDTO })
   @ApiNotFoundResponse({ description: 'Product not found' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async getProduct(@Query('id') id: string) {
-    return this.productService.getProduct(id);
+  async getProduct(@CurrentUser() { id }: JwtPayload, @Query('id') productId: string) {
+    return this.productService.getProduct(id, productId);
   }
 
   @Put()
@@ -59,6 +59,17 @@ export class ProductController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async getProductList(@CurrentUser() { id }: JwtPayload) {
     return this.productService.getProducts(id);
+  }
+
+  @Get('search')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('access'))
+  @ApiOperation({ summary: '상품 검색하기' })
+  @ApiOkResponse({ description: 'Product list', type: [GetProductDTO] })
+  @ApiNotFoundResponse({ description: 'Products not found' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  async searchProduct(@CurrentUser() { id }: JwtPayload, @Query('keyword') keyword: string) {
+    return this.productService.searchProducts(id, keyword);
   }
 
   @Put('favorite')
