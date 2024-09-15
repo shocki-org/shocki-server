@@ -14,6 +14,7 @@ import {
 import { AuthService } from 'src/auth/auth.service';
 import { CoolsmsService } from 'src/common/modules/coolsms/coolsms.service';
 
+import { AlertService } from '../alert/alert.service';
 import { OAuthDTO } from './dto/oauth.dto';
 import {
   PhoneRegisterFinalDTO,
@@ -29,6 +30,7 @@ export class RegisterService {
   constructor(
     private readonly coolsmsService: CoolsmsService,
     private readonly authService: AuthService,
+    private readonly alertService: AlertService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {
     this.oAuth2Client = new OAuth2Client();
@@ -62,7 +64,17 @@ export class RegisterService {
 
     return this.authService
       .createUser(Provider.PHONE, phone, dto.password)
-      .then((registeredUser) => this.authService.createTokens(registeredUser.id));
+      .then((registeredUser) => {
+        this.alertService.createAlert(
+          {
+            title: '가입 환영',
+            content: 'Shocki에 오신 것을 환영합니다.',
+            type: 'INFO',
+          },
+          registeredUser.id,
+        );
+        return this.authService.createTokens(registeredUser.id);
+      });
   }
 
   async login(dto: OAuthDTO) {
@@ -115,7 +127,17 @@ export class RegisterService {
     } else if (!user) {
       return this.authService
         .createUser(oauthUser.provider, oauthUser.providerId)
-        .then((registeredUser) => this.authService.createTokens(registeredUser.id));
+        .then((registeredUser) => {
+          this.alertService.createAlert(
+            {
+              title: '가입 환영',
+              content: 'Shocki에 오신 것을 환영합니다.',
+              type: 'INFO',
+            },
+            registeredUser.id,
+          );
+          return this.authService.createTokens(registeredUser.id);
+        });
     }
 
     return this.authService.createTokens(user.id);
