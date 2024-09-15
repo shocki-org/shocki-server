@@ -14,7 +14,7 @@ export class OAuthDTO {
   accessToken?: string;
 
   @IsString()
-  @Matches('^+8210d{8}$', 'g', { message: 'Invalid phone number' })
+  @Matches('^[+]8210[0-9]{8}$', 'g', { message: 'Invalid phone number' })
   @ApiProperty({ required: false, nullable: true })
   phone?: string;
 
