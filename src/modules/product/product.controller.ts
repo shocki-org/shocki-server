@@ -57,7 +57,7 @@ export class ProductController {
     return this.productService.getProducts(id);
   }
 
-  @Get('favorite/:productId')
+  @Put('favorite/:productId')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('access'))
   @ApiOkResponse({ description: 'Success' })
@@ -70,7 +70,7 @@ export class ProductController {
     return { success: true };
   }
 
-  @Get('unfavorite/:productId')
+  @Put('unfavorite/:productId')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('access'))
   @ApiOkResponse({ description: 'Success' })
