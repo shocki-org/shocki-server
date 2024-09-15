@@ -21,7 +21,6 @@
     "postinstall": "pnpx prisma generate"
   },
   "dependencies": {
-    "@aws-sdk/client-sns": "^3.649.0",
     "@nestjs/cache-manager": "^2.2.2",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.3",
