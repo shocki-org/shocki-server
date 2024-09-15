@@ -81,7 +81,7 @@ model Product {
   type                       ProductType                  @default(FUNDING)
   currentAmount              Int
   targetAmount               Int
-  collectedAmount            Int
+  collectedAmount            Int                          @default(0)
   fundingEndDate             DateTime
   productQnA                 ProductQnA[]
   fundingLog                 FundingLog[]
