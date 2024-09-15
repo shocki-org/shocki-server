@@ -24,18 +24,18 @@ model User {
   provider    Provider
   providerId  String
   password    String?
-  Address     Address[]
-  Alert       Alert[]
+  address     Address[]
+  alert       Alert[]
   productQnA  ProductQnA[]
   fundingLog  FundingLog[]
-  UserAccount UserAccount?
-  Product     Product[]
+  userAccount UserAccount?
+  product     Product[]
 }
 
 model UserAccount {
   id                         String                       @id @default(uuid())
   userId                     String                       @unique
-  user                       User                         @relation(fields: [userId], references: [id])
+  user                       User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
   credit                     Int                          @default(0)
   UserTokenBalancesOnProduct UserTokenBalancesOnProduct[]
 }
@@ -43,7 +43,7 @@ model UserAccount {
 model Address {
   id            String @id @default(uuid())
   userId        String
-  user          User   @relation(fields: [userId], references: [id])
+  user          User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   name          String
   phone         String // +821012345678
   address       String
@@ -59,7 +59,7 @@ model Category {
 model Alert {
   id        String   @id @default(uuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   title     String
   content   String
   type      Int
@@ -74,7 +74,7 @@ enum ProductType {
 model Product {
   id                         String                       @id @default(uuid())
   ownerId                    String
-  user                       User                         @relation(fields: [ownerId], references: [id])
+  user                       User                         @relation(fields: [ownerId], references: [id], onDelete: Restrict)
   name                       String
   image                      String
   detailImage                String
@@ -86,24 +86,24 @@ model Product {
   productQnA                 ProductQnA[]
   fundingLog                 FundingLog[]
   categories                 CategoriesOnProduct[]
-  UserTokenBalancesOnProduct UserTokenBalancesOnProduct[]
+  userTokenBalancesOnProduct UserTokenBalancesOnProduct[]
 }
 
 model FundingLog {
   id        Int      @id @default(autoincrement())
   productId String
-  product   Product  @relation(fields: [productId], references: [id])
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   amount    Int
   createdAt DateTime @default(now())
 }
 
 model CategoriesOnProduct {
   productId  String
-  product    Product  @relation(fields: [productId], references: [id])
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   categoryId String
-  category   Category @relation(fields: [categoryId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   assignedAt DateTime @default(now())
 
   @@id([productId, categoryId])
@@ -117,10 +117,10 @@ enum ProductQnAAuthorType {
 model ProductQnA {
   id         String               @id @default(uuid())
   productId  String
-  product    Product              @relation(fields: [productId], references: [id])
+  product    Product              @relation(fields: [productId], references: [id], onDelete: Cascade)
   authorType ProductQnAAuthorType
-  authorId   String
-  user       User                 @relation(fields: [authorId], references: [id])
+  authorId   String?
+  user       User?                @relation(fields: [authorId], references: [id], onDelete: SetNull)
   content    String
   createdAt  DateTime             @default(now())
 }
@@ -128,9 +128,9 @@ model ProductQnA {
 model UserTokenBalancesOnProduct {
   id            String      @id @default(uuid())
   userAccountId String
-  userAccount   UserAccount @relation(fields: [userAccountId], references: [id])
+  userAccount   UserAccount @relation(fields: [userAccountId], references: [id], onDelete: Restrict)
   productId     String
-  product       Product     @relation(fields: [productId], references: [id])
-  token         Int         @default(0)
+  product       Product     @relation(fields: [productId], references: [id], onDelete: Restrict)
+  token         Int
   createdAt     DateTime    @default(now())
 }
