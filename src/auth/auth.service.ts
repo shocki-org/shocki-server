@@ -38,7 +38,7 @@ export class AuthService {
         provider,
         providerId,
         password: password ? await hash(password, 10) : null,
-        UserAccount: {
+        userAccount: {
           create: {},
         },
       },
