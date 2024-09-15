@@ -1,4 +1,4 @@
-import { JsonRpcProvider, Wallet } from 'ethers';
+import { Wallet, providers } from 'ethers';
 import hre from 'hardhat';
 import { ERC20__factory } from 'typechain-types';
 
@@ -13,11 +13,11 @@ export class BlockchainService {
     'https://soneium-minato.rpc.scs.startale.com/?apikey=BFlJo8vAg4VBibKgfmKBvItDiUoQrHxg';
   private DEPLOYER_PRIVATE_KEY: string =
     'a0e7a04066ba4bbeaff430afaf3fafc5c553b22fa51a9196c53f95dae808799e';
-  private provider: JsonRpcProvider;
+  private provider: providers.JsonRpcProvider;
   private deployer: Wallet;
 
   constructor() {
-    this.provider = new JsonRpcProvider(this.PRC_URL);
+    this.provider = new providers.JsonRpcProvider(this.PRC_URL);
     this.deployer = new Wallet(this.DEPLOYER_PRIVATE_KEY, this.provider);
   }
 
