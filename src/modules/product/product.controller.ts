@@ -6,6 +6,7 @@ import {
   ApiBody,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -25,6 +26,7 @@ export class ProductController {
   @Get()
   @ApiBearerAuth()
   @UseGuards(AuthGuard('access'))
+  @ApiOperation({ summary: '상품 가져오기' })
   @ApiOkResponse({ description: 'Product', type: GetProductDTO })
   @ApiNotFoundResponse({ description: 'Product not found' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
@@ -32,9 +34,10 @@ export class ProductController {
     return this.productService.getProduct(id);
   }
 
-  @Put('')
+  @Put()
   @ApiBearerAuth()
   @UseGuards(AuthGuard('access'))
+  @ApiOperation({ summary: '상품 만들기' })
   @ApiBody({
     type: CreateProductDTO,
     description: 'Create product',
@@ -50,6 +53,7 @@ export class ProductController {
   @Get('list')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('access'))
+  @ApiOperation({ summary: '상품들 가져오기' })
   @ApiOkResponse({ description: 'Product list', type: [GetProductDTO] })
   @ApiNotFoundResponse({ description: 'Products not found' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
@@ -60,6 +64,7 @@ export class ProductController {
   @Put('favorite')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('access'))
+  @ApiOperation({ summary: '좋아요 누르기' })
   @ApiOkResponse({ description: 'Success' })
   @ApiNotFoundResponse({ description: 'Product not found' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
@@ -73,6 +78,7 @@ export class ProductController {
   @Put('unfavorite')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('access'))
+  @ApiOperation({ summary: '좋아요 취소하기' })
   @ApiOkResponse({ description: 'Success' })
   @ApiNotFoundResponse({ description: 'Product not found' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
