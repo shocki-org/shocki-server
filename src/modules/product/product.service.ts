@@ -4,6 +4,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from 'src/common/modules/prisma/prisma.service';
 
+import { CreateProductDTO } from './dto/create.product.dto';
+
 @Injectable()
 export class ProductService {
   constructor(private readonly prisma: PrismaService) {}
@@ -92,11 +94,43 @@ export class ProductService {
       .then((product) => console.log(product.id));
   }
 
-  async getProduct(id: string) {
+  async createProduct(userId: string, dto: CreateProductDTO) {
+    return this.prisma.product.create({
+      data: {
+        name: dto.name,
+        image: '상품 이미지 URL',
+        detailImage: '상세 이미지 URL',
+        currentAmount: dto.currentAmount,
+        targetAmount: dto.targetAmount,
+        fundingEndDate: DateTime.fromISO(dto.fundingEndDate).toJSDate(),
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+        categories: {
+          create: dto.category.map((category) => ({
+            category: {
+              connectOrCreate: {
+                where: {
+                  name: category,
+                },
+                create: {
+                  name: category,
+                },
+              },
+            },
+          })),
+        },
+      },
+    });
+  }
+
+  async getProduct(productId: string) {
     return this.prisma.product
       .findFirstOrThrow({
         where: {
-          id,
+          id: productId,
         },
         include: {
           fundingLog: {
