@@ -5,6 +5,7 @@ import {
   ApiBearerAuth,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -23,6 +24,7 @@ export class UserController {
   @Get('favorite')
   @UseGuards(AuthGuard('access'))
   @ApiBearerAuth()
+  @ApiOperation({ summary: '좋아요 목록 불러오기' })
   @ApiOkResponse({ description: 'Favorite products', type: [FavoriteProductDTO] })
   @ApiNotFoundResponse({ description: 'Favorite products not found' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
@@ -33,6 +35,7 @@ export class UserController {
   @Delete('delete')
   @UseGuards(AuthGuard('access'))
   @ApiBearerAuth()
+  @ApiOperation({ summary: '유저 탈퇴' })
   @ApiOkResponse({ description: 'Success' })
   @ApiBadRequestResponse({ description: '응답 참조' })
   @ApiNotFoundResponse({ description: 'User not found' })
