@@ -1,6 +1,7 @@
 import { Controller, Delete, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -22,6 +23,7 @@ export class UserController {
   @UseGuards(AuthGuard('access'))
   @ApiBearerAuth()
   @ApiOkResponse({ description: 'Success' })
+  @ApiBadRequestResponse({ description: '응답 참조' })
   @ApiNotFoundResponse({ description: 'User not found' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async deleteUser(@CurrentUser() { id }: JwtPayload) {
