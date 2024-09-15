@@ -38,7 +38,7 @@ export class RegisterController {
   async login(@Body() dto: OAuthDTO) {
     const token = await this.registerService.login(dto);
 
-    return { token };
+    return { accessToken: token };
   }
 
   @Post('phone/first')
@@ -78,6 +78,6 @@ export class RegisterController {
   async phoneRegisterFinal(@Body() dto: PhoneRegisterFinalDTO) {
     const token = await this.registerService.phoneRegisterFinal(dto);
 
-    return { token };
+    return { accessToken: token };
   }
 }
