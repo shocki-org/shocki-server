@@ -13,6 +13,25 @@ import { PrismaService } from 'src/common/modules/prisma/prisma.service';
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async getFavoriteProducts(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        favoriteProducts: {
+          select: {
+            productId: true,
+          },
+        },
+      },
+    });
+
+    if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
+
+    return user.favoriteProducts;
+  }
+
   async deleteUser(userId: string) {
     const user = await this.prisma.user.findUnique({
       where: {
