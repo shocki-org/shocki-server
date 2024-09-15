@@ -1,9 +1,10 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, Matches } from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
 
 export class PhoneRegisterFirstDTO {
   @IsString()
+  @Matches('^+8210d{8}$', 'g', { message: 'Invalid phone number' })
   @IsNotEmpty()
   @ApiProperty({
     example: '+821012345678',
@@ -13,6 +14,7 @@ export class PhoneRegisterFirstDTO {
 
 export class PhoneRegisterSecondDTO {
   @IsString()
+  @Matches('^+8210d{8}$', 'g', { message: 'Invalid phone number' })
   @IsNotEmpty()
   @ApiProperty({
     example: '+821012345678',
