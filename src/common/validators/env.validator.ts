@@ -45,6 +45,14 @@ class EnvironmentVariables {
   @IsString()
   @IsNotEmpty()
   COOLSMS_SENDER: string;
+
+  @IsString()
+  @IsNotEmpty()
+  RPC_URL: string;
+
+  @IsString()
+  @IsNotEmpty()
+  DEPLOYER_PRIVATE_KEY: string;
 }
 
 export function validate(config: Record<string, unknown>) {
