@@ -177,26 +177,33 @@ export class ProductService {
       });
   }
 
-  async getProducts(userId: string) {
-    return this.prisma.product
-      .findMany({
-        include: {
-          userFavorite: {
-            select: {
-              userId: true,
-            },
-            where: {
-              userId: userId,
-            },
+  async getProducts() {
+    return this.prisma.product.findMany({
+      select: {
+        id: true,
+        name: true,
+        image: true,
+        currentAmount: true,
+      },
+    });
+  }
+
+  async getFavoriteProducts(userId: string) {
+    return this.prisma.product.findMany({
+      select: {
+        id: true,
+        name: true,
+        image: true,
+        currentAmount: true,
+      },
+      where: {
+        userFavorite: {
+          some: {
+            userId,
           },
         },
-      })
-      .then((product) => {
-        return product.map((product) => ({
-          ...product,
-          userFavorite: !!product.userFavorite.length,
-        }));
-      });
+      },
+    });
   }
 
   async searchProducts(keyword: string) {

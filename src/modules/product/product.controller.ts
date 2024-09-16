@@ -15,7 +15,7 @@ import { JwtPayload } from 'src/auth/model/payload.jwt.model';
 import { CurrentUser } from 'src/common';
 
 import { CreateProductDTO } from './dto/create.product.dto';
-import { GetProductDTO } from './dto/get.product.dto';
+import { GetProductDTO, GetProductsDTO } from './dto/get.product.dto';
 import { SearchProductDTO } from './dto/search.product.dto';
 import { ProductService } from './product.service';
 
@@ -55,11 +55,20 @@ export class ProductController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('access'))
   @ApiOperation({ summary: '상품들 가져오기' })
-  @ApiOkResponse({ description: 'Product list', type: [GetProductDTO] })
-  @ApiNotFoundResponse({ description: 'Products not found' })
+  @ApiOkResponse({ description: 'Product list', type: [GetProductsDTO] })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async getProductList(@CurrentUser() { id }: JwtPayload) {
-    return this.productService.getProducts(id);
+  async getProductList() {
+    return this.productService.getProducts();
+  }
+
+  @Get('favorite')
+  @UseGuards(AuthGuard('access'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '좋아요 목록 불러오기' })
+  @ApiOkResponse({ description: 'Favorite products', type: [GetProductsDTO] })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  async getFavoriteProducts(@CurrentUser() { id }: JwtPayload) {
+    return this.productService.getFavoriteProducts(id);
   }
 
   @Get('search')
