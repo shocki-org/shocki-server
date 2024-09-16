@@ -66,8 +66,7 @@ export class ProductController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('access'))
   @ApiOperation({ summary: '상품 검색하기' })
-  @ApiOkResponse({ description: 'Product list', type: [SearchProductDTO] })
-  @ApiNotFoundResponse({ description: 'Products not found' })
+  @ApiOkResponse({ description: 'Product list (없으면 빈 배열)', type: [SearchProductDTO] })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async searchProduct(@Query('keyword') keyword: string) {
     return this.productService.searchProducts(keyword);
