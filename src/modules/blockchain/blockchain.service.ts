@@ -59,7 +59,7 @@ export class BlockchainService {
   }
 
   async transfer(to: string, amount: number, address: string): Promise<void> {
-    const erc20 = await ERC20__factory.connect(address, this.deployer);
+    const erc20 = ERC20__factory.connect(address, this.deployer);
 
     const transfer = await erc20.transfer(to, amount);
 
