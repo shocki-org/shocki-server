@@ -1,4 +1,4 @@
-import { $Enums, Category, FundingLog, Product, ProductQnA, UserFavorite } from '@prisma/client';
+import { $Enums, FundingLog, Product, ProductQnA } from '@prisma/client';
 
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -38,8 +38,8 @@ export class ProductQnADTO implements Partial<ProductQnA> {
   @ApiProperty({ enum: $Enums.ProductQnAAuthorType })
   authorType: $Enums.ProductQnAAuthorType;
 
-  @ApiProperty({ description: '작성자 ID' })
-  authorId: string;
+  @ApiProperty({ description: '작성자 ID', nullable: true })
+  authorId: string | null;
 
   @ApiProperty({ description: 'QnA 내용' })
   content: string;
@@ -56,12 +56,10 @@ export class FundingLogDTO implements Partial<FundingLog> {
   createdAt: Date;
 }
 
-export class CategoryDTO implements Partial<Category> {
-  @ApiProperty({ description: '카테고리 이름' })
-  name: string;
-}
+export class ProductGraphDTO {
+  @ApiProperty({ description: '인덱스' })
+  x: number;
 
-export class ProductCategoryDTO {
-  @ApiProperty({ description: '카테고리', type: CategoryDTO })
-  category: CategoryDTO;
+  @ApiProperty({ description: '펀딩 금액' })
+  y: number;
 }

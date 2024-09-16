@@ -5,6 +5,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { PrismaService } from 'src/common/modules/prisma/prisma.service';
 
 import { CreateProductDTO } from './dto/create.product.dto';
+import { GetProductDTO } from './dto/get.product.dto';
 
 @Injectable()
 export class ProductService {
@@ -126,7 +127,7 @@ export class ProductService {
     });
   }
 
-  async getProduct(userId: string, productId: string) {
+  async getProduct(userId: string, productId: string): Promise<GetProductDTO> {
     return this.prisma.product
       .findFirstOrThrow({
         where: {
@@ -171,6 +172,27 @@ export class ProductService {
           ...product,
           userFavorite: !!product.userFavorite.length,
         };
+      })
+      .then((product) => {
+        return {
+          ...product,
+          categories: product.categories.map((category) => category.category.name),
+        };
+      })
+      .then((product) => {
+        return {
+          ...product,
+          graph: product.fundingLog.map((log, y) => ({
+            x: log.amount,
+            y,
+          })),
+        };
+      })
+      .then((product) => {
+        const copy: { [key: string]: any } = { ...product };
+        delete copy['fundingLog'];
+
+        return copy as unknown as GetProductDTO;
       })
       .catch((error) => {
         throw new NotFoundException(error.message);
