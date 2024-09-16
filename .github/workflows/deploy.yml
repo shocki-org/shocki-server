@@ -25,5 +25,5 @@ jobs:
             git pull origin main
             pnpm i
             DATABASE_URL=${{ secrets.DATABASE_URL }} pnpx prisma migrate dev -n init
-            docker system prune -f
+            docker system prune -af
             docker compose up -d --build --force-recreate
