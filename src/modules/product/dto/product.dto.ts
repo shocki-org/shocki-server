@@ -38,7 +38,12 @@ export class ProductQnADTO implements Partial<ProductQnA> {
   @ApiProperty({ enum: $Enums.ProductQnAAuthorType })
   authorType: $Enums.ProductQnAAuthorType;
 
-  @ApiProperty({ description: '작성자 ID', nullable: true })
+  @ApiProperty({
+    description: '작성자 ID',
+    nullable: true,
+    example: 'User ID',
+    type: String || null,
+  })
   authorId: string | null;
 
   @ApiProperty({ description: 'QnA 내용' })
