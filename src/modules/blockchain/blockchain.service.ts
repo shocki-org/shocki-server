@@ -15,11 +15,11 @@ export class BlockchainService {
 
   constructor(
     private readonly configService: ConfigService<{
-      PRC_URL: string;
+      RPC_URL: string;
       DEPLOYER_PRIVATE_KEY: string;
     }>,
   ) {
-    this.provider = new providers.JsonRpcProvider(this.configService.get('PRC_URL')!);
+    this.provider = new providers.JsonRpcProvider(this.configService.get('RPC_URL')!);
     this.deployer = new Wallet(this.configService.get('DEPLOYER_PRIVATE_KEY')!, this.provider);
   }
 
