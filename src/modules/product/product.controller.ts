@@ -124,7 +124,10 @@ export class ProductController {
   @ApiOkResponse({ description: 'Success' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiNotFoundResponse({ description: 'Product not found' })
-  async createProductQnA(@CurrentUser() { id }: JwtPayload, @Body() dto: CreateProductQnADTO) {
+  async createProductQnA(
+    @CurrentUser() { id }: JwtPayload,
+    @Body() dto: CreateProductQnADTO,
+  ): Promise<{ success: boolean }> {
     await this.productService.createProductQnA(id, dto);
 
     return { success: true };
