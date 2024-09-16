@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { PickType } from '@nestjs/swagger';
 
 import { FundingLogDTO, ProductCategoryDTO, ProductDTO, ProductQnADTO } from './product.dto';
 
@@ -18,3 +19,10 @@ export class GetProductDTO extends ProductDTO {
   })
   userFavorite: boolean;
 }
+
+export class GetProductsDTO extends PickType(ProductDTO, [
+  'id',
+  'name',
+  'image',
+  'currentAmount',
+]) {}
