@@ -16,6 +16,7 @@ import { CurrentUser } from 'src/common';
 
 import { CreateProductDTO } from './dto/create.product.dto';
 import { GetProductDTO } from './dto/get.product.dto';
+import { SearchProductDTO } from './dto/search.product.dto';
 import { ProductService } from './product.service';
 
 @Controller('product')
@@ -30,8 +31,8 @@ export class ProductController {
   @ApiOkResponse({ description: 'Product', type: GetProductDTO })
   @ApiNotFoundResponse({ description: 'Product not found' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async getProduct(@Query('id') id: string) {
-    return this.productService.getProduct(id);
+  async getProduct(@CurrentUser() { id }: JwtPayload, @Query('id') productId: string) {
+    return this.productService.getProduct(id, productId);
   }
 
   @Put()
@@ -59,6 +60,17 @@ export class ProductController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async getProductList(@CurrentUser() { id }: JwtPayload) {
     return this.productService.getProducts(id);
+  }
+
+  @Get('search')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('access'))
+  @ApiOperation({ summary: '상품 검색하기' })
+  @ApiOkResponse({ description: 'Product list', type: [SearchProductDTO] })
+  @ApiNotFoundResponse({ description: 'Products not found' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  async searchProduct(@Query('keyword') keyword: string) {
+    return this.productService.searchProducts(keyword);
   }
 
   @Put('favorite')

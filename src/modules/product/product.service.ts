@@ -126,7 +126,7 @@ export class ProductService {
     });
   }
 
-  async getProduct(productId: string) {
+  async getProduct(userId: string, productId: string) {
     return this.prisma.product
       .findFirstOrThrow({
         where: {
@@ -136,6 +136,9 @@ export class ProductService {
           userFavorite: {
             select: {
               userId: true,
+            },
+            where: {
+              userId: userId,
             },
           },
           fundingLog: {
@@ -194,6 +197,22 @@ export class ProductService {
           userFavorite: !!product.userFavorite.length,
         }));
       });
+  }
+
+  async searchProducts(keyword: string) {
+    return this.prisma.product.findMany({
+      where: {
+        name: {
+          contains: keyword,
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        image: true,
+        currentAmount: true,
+      },
+    });
   }
 
   async favoriteProduct(userId: string, productId: string) {
