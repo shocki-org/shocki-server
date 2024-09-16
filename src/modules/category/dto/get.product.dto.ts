@@ -1,17 +1,10 @@
-import { Product } from '@prisma/client';
+import { PickType } from '@nestjs/swagger';
 
-import { ApiProperty } from '@nestjs/swagger';
+import { ProductDTO } from 'src/modules/product/dto/product.dto';
 
-export class GetProductsByCategoryDTO implements Partial<Product> {
-  @ApiProperty({ description: '상품 ID' })
-  id: string;
-
-  @ApiProperty({ description: '상품 이름' })
-  name: string;
-
-  @ApiProperty({ description: '상품 이미지' })
-  image: string;
-
-  @ApiProperty({ description: '상품 현재가' })
-  currentAmount: number;
-}
+export class GetProductsByCategoryDTO extends PickType(ProductDTO, [
+  'id',
+  'name',
+  'image',
+  'currentAmount',
+]) {}
