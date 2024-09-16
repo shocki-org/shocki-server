@@ -1,3 +1,4 @@
+import { ProductQnAAuthorType } from '@prisma/client';
 import { DateTime } from 'luxon';
 
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
@@ -5,6 +6,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { PrismaService } from 'src/common/modules/prisma/prisma.service';
 
 import { CreateProductDTO } from './dto/create.product.dto';
+import { CreateProductQnADTO } from './dto/create.qna.dto';
 import { GetProductDTO } from './dto/get.product.dto';
 
 @Injectable()
@@ -278,6 +280,34 @@ export class ProductService {
       .catch(() => {
         throw new BadRequestException('찜한 상품이 아닙니다.');
       });
+  }
+
+  async createProductQnA(userId: string, { productId, content }: CreateProductQnADTO) {
+    const product = await this.prisma.product.findUnique({
+      where: {
+        id: productId,
+      },
+    });
+
+    if (!product) throw new NotFoundException('상품을 찾을 수 없습니다.');
+
+    return this.prisma.productQnA.create({
+      data: {
+        content,
+        authorType:
+          product.ownerId === userId ? ProductQnAAuthorType.SELLER : ProductQnAAuthorType.BUYER,
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+        product: {
+          connect: {
+            id: productId,
+          },
+        },
+      },
+    });
   }
 
   // async buyProductToken(userId: string, productId: string, amount: number) {}

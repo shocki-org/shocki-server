@@ -15,6 +15,7 @@ import { JwtPayload } from 'src/auth/model/payload.jwt.model';
 import { CurrentUser } from 'src/common';
 
 import { CreateProductDTO } from './dto/create.product.dto';
+import { CreateProductQnADTO } from './dto/create.qna.dto';
 import { GetProductDTO, GetProductsDTO } from './dto/get.product.dto';
 import { SearchProductDTO } from './dto/search.product.dto';
 import { ProductService } from './product.service';
@@ -108,6 +109,23 @@ export class ProductController {
     @Query('productId') productId: string,
   ) {
     await this.productService.unfavoriteProduct(id, productId);
+
+    return { success: true };
+  }
+
+  @Post('qna')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('access'))
+  @ApiOperation({ summary: 'QnA 작성하기' })
+  @ApiBody({
+    type: CreateProductQnADTO,
+    description: 'Create product QnA',
+  })
+  @ApiOkResponse({ description: 'Success' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiNotFoundResponse({ description: 'Product not found' })
+  async createProductQnA(@CurrentUser() { id }: JwtPayload, @Body() dto: CreateProductQnADTO) {
+    await this.productService.createProductQnA(id, dto);
 
     return { success: true };
   }
