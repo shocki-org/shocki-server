@@ -53,6 +53,30 @@ class EnvironmentVariables {
   @IsString()
   @IsNotEmpty()
   DEPLOYER_PRIVATE_KEY: string;
+
+  @IsString()
+  @IsNotEmpty()
+  S3_PUBLIC_URL: string;
+
+  @IsString()
+  @IsNotEmpty()
+  S3_BUCKET_NAME: string;
+
+  @IsString()
+  @IsNotEmpty()
+  S3_REGION: string;
+
+  @IsString()
+  @IsNotEmpty()
+  S3_ACCESS_KEY: string;
+
+  @IsString()
+  @IsNotEmpty()
+  S3_SECRET_KEY: string;
+
+  @IsString()
+  @IsNotEmpty()
+  S3_ENDPOINT: string;
 }
 
 export function validate(config: Record<string, unknown>) {
