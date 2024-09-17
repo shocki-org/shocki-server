@@ -101,6 +101,7 @@ model Product {
   targetAmount               Int
   collectedAmount            Int                          @default(0)
   fundingEndDate             DateTime
+  tokenAddress               String?
   productQnA                 ProductQnA[]
   fundingLog                 FundingLog[]
   categories                 CategoriesOnProduct[]
