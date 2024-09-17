@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -10,4 +10,14 @@ export class UpdateWalletDTO {
     description: '지갑 주소',
   })
   walletAddress: string;
+}
+
+export class UpdateCreditDTO {
+  @IsNotEmpty()
+  @IsNumber()
+  @ApiProperty({
+    example: 100,
+    description: '크레딧',
+  })
+  credit: number;
 }

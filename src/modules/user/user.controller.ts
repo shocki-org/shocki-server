@@ -14,7 +14,7 @@ import { JwtPayload } from 'src/auth/model/payload.jwt.model';
 import { CurrentUser } from 'src/common';
 
 import { GetUserDTO } from './dto/get.user.dto';
-import { UpdateWalletDTO } from './dto/update.user.dto';
+import { UpdateCreditDTO, UpdateWalletDTO } from './dto/update.user.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -68,7 +68,7 @@ export class UserController {
   @ApiBadRequestResponse({ description: '응답 참조' })
   @ApiNotFoundResponse({ description: 'User not found' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async updateCredit(@CurrentUser() { id }: JwtPayload, @Body('credit') credit: number) {
-    await this.userService.updateCredit(id, credit);
+  async updateCredit(@CurrentUser() { id }: JwtPayload, @Body() body: UpdateCreditDTO) {
+    await this.userService.updateCredit(id, body.credit);
   }
 }
