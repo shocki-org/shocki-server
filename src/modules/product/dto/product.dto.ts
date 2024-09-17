@@ -32,6 +32,9 @@ export class ProductDTO implements Product {
 
   @ApiProperty({ description: '펀딩 종료일' })
   fundingEndDate: Date;
+
+  @ApiProperty({ description: '토큰 주소' })
+  tokenAddress: string;
 }
 
 export class ProductQnADTO implements Partial<ProductQnA> {

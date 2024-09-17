@@ -132,4 +132,22 @@ export class ProductController {
 
     return { success: true };
   }
+
+  @Post('purchase/token')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('access'))
+  @ApiOperation({ summary: '상품 구매하기' })
+  @ApiOkResponse({ description: 'Success' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiBadRequestResponse({ description: 'Not enough amount' })
+  @ApiNotFoundResponse({ description: 'Product not found' })
+  async purchaseProductToken(
+    @CurrentUser() { id }: JwtPayload,
+    @Query('productId') productId: string,
+    @Query('amount') amount: number,
+  ) {
+    await this.productService.purchaseProductToken(id, productId, amount);
+
+    return { success: true };
+  }
 }

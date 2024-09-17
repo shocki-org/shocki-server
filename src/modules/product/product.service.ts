@@ -102,7 +102,7 @@ export class ProductService {
   }
 
   async createProduct(userId: string, dto: CreateProductDTO) {
-    return this.prisma.product.create({
+    const product = await this.prisma.product.create({
       data: {
         name: dto.name,
         image: '상품 이미지 URL',
@@ -334,7 +334,55 @@ export class ProductService {
     });
   }
 
-  // async buyProductToken(userId: string, productId: string, amount: number) {}
+  async purchaseProductToken(userId: string, productId: string, amount: number) {
+    const product = await this.prisma.product.findUnique({
+      where: {
+        id: productId,
+      },
+    });
+
+    if (!product || !product.tokenAddress) throw new NotFoundException('상품을 찾을 수 없습니다.');
+
+    const user = await this.prisma.userAccount.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user?.walletAddress) throw new BadRequestException('지갑 주소가 없습니다.');
+
+    if (product.currentAmount * amount < (user?.credit ?? 0))
+      throw new BadRequestException('잔액이 부족합니다.');
+
+    await this.prisma.userAccount.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        credit: user!.credit - product.currentAmount * amount,
+      },
+    });
+
+    await this.prisma.product.update({
+      where: {
+        id: productId,
+      },
+      data: {
+        fundingLog: {
+          create: {
+            amount,
+            user: {
+              connect: {
+                id: userId,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    await this.blockchainService.transfer(user.walletAddress, amount, product.tokenAddress);
+  }
 
   // async sellProductToken(userId: string, productId: string, amount: number) {}
 
