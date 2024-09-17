@@ -13,6 +13,17 @@ import { PrismaService } from 'src/common/modules/prisma/prisma.service';
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async updateWalletAddress(id: string, walletAddress: string) {
+    await this.prisma.userAccount.update({
+      where: {
+        id,
+      },
+      data: {
+        walletAddress,
+      },
+    });
+  }
+
   async deleteUser(userId: string) {
     const user = await this.prisma.user.findUnique({
       where: {

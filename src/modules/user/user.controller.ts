@@ -1,4 +1,4 @@
-import { Controller, Delete, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Put, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBadRequestResponse,
@@ -13,12 +13,28 @@ import {
 import { JwtPayload } from 'src/auth/model/payload.jwt.model';
 import { CurrentUser } from 'src/common';
 
+import { UpdateWalletDTO } from './dto/update.user.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
 @ApiTags('User')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Put('address')
+  @UseGuards(AuthGuard('access'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '유저 지갑 주소 변경' })
+  @ApiOkResponse({ description: 'Success' })
+  @ApiBadRequestResponse({ description: '응답 참조' })
+  @ApiNotFoundResponse({ description: 'User not found' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  async updateWalletAddress(
+    @CurrentUser() { id }: JwtPayload,
+    @Body() { walletAddress }: UpdateWalletDTO,
+  ) {
+    await this.userService.updateWalletAddress(id, walletAddress);
+  }
 
   @Delete('delete')
   @UseGuards(AuthGuard('access'))
