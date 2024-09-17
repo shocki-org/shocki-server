@@ -38,7 +38,7 @@ model UserAccount {
   userId                     String                       @unique
   user                       User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
   credit                     Int                          @default(0)
-  walletAddress              String
+  walletAddress              String?
   UserTokenBalancesOnProduct UserTokenBalancesOnProduct[]
 }
 
