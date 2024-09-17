@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Put, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBadRequestResponse,
@@ -13,6 +13,7 @@ import {
 import { JwtPayload } from 'src/auth/model/payload.jwt.model';
 import { CurrentUser } from 'src/common';
 
+import { GetUserDTO } from './dto/get.user.dto';
 import { UpdateWalletDTO } from './dto/update.user.dto';
 import { UserService } from './user.service';
 
@@ -20,6 +21,17 @@ import { UserService } from './user.service';
 @ApiTags('User')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Get()
+  @UseGuards(AuthGuard('access'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '유저 정보 가져오기' })
+  @ApiOkResponse({ description: 'User', type: GetUserDTO })
+  @ApiNotFoundResponse({ description: 'User not found' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  async getUser(@CurrentUser() { id }: JwtPayload) {
+    return this.userService.getUser(id);
+  }
 
   @Put('address')
   @UseGuards(AuthGuard('access'))
