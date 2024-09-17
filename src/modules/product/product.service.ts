@@ -2,6 +2,7 @@ import { ProductQnAAuthorType } from '@prisma/client';
 import { DateTime } from 'luxon';
 
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 import { PrismaService } from 'src/common/modules/prisma/prisma.service';
 
@@ -15,6 +16,9 @@ export class ProductService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly blockchainService: BlockchainService,
+    private readonly configService: ConfigService<{
+      S3_PUBLIC_URL: string;
+    }>,
   ) {}
 
   async createTestProduct(userId: string) {
@@ -105,7 +109,6 @@ export class ProductService {
     const product = await this.prisma.product.create({
       data: {
         name: dto.name,
-        image: '상품 이미지 URL',
         detailImage: '상세 이미지 URL',
         currentAmount: dto.currentAmount,
         targetAmount: dto.targetAmount,
@@ -138,7 +141,7 @@ export class ProductService {
     const address = await this.blockchainService.create(
       dto.name,
       `SH${length}`,
-      'https://ipfs.io/ipfs/QmZzv1Q2',
+      `${this.configService.get('S3_PUBLIC_URL')}/${product.id}/0.png`,
     );
 
     await this.prisma.product.update({
