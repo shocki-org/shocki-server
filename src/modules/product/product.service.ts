@@ -141,7 +141,7 @@ export class ProductService {
     const address = await this.blockchainService.create(
       dto.name,
       `SH${length}`,
-      `${this.configService.get('S3_PUBLIC_URL')}/${product.id}/0.png`,
+      `${this.configService.get('S3_PUBLIC_URL')}/${product.id}/1.png`,
     );
 
     await this.prisma.product.update({
