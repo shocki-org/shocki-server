@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Patch, Post, Put, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBadRequestResponse,
@@ -58,5 +58,17 @@ export class UserController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async deleteUser(@CurrentUser() { id }: JwtPayload) {
     await this.userService.deleteUser(id);
+  }
+
+  @Put('credit')
+  @UseGuards(AuthGuard('access'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '유저 크레딧 변경' })
+  @ApiOkResponse({ description: 'Success' })
+  @ApiBadRequestResponse({ description: '응답 참조' })
+  @ApiNotFoundResponse({ description: 'User not found' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  async updateCredit(@CurrentUser() { id }: JwtPayload, @Body('credit') credit: number) {
+    await this.userService.updateCredit(id, credit);
   }
 }

@@ -39,6 +39,17 @@ export class UserService {
     });
   }
 
+  async updateCredit(id: string, credit: number) {
+    await this.prisma.userAccount.update({
+      where: {
+        id,
+      },
+      data: {
+        credit,
+      },
+    });
+  }
+
   async deleteUser(userId: string) {
     const user = await this.prisma.user.findUnique({
       where: {
