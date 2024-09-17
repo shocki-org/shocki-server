@@ -18,6 +18,7 @@ import { CreateProductDTO } from './dto/create.product.dto';
 import { CreateProductQnADTO } from './dto/create.qna.dto';
 import { GetProductDTO, GetProductsDTO } from './dto/get.product.dto';
 import { SearchProductDTO } from './dto/search.product.dto';
+import { UploadImageDTO } from './dto/upload.image.dto';
 import { ProductService } from './product.service';
 
 @Controller('product')
@@ -55,6 +56,10 @@ export class ProductController {
   @Put('image')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('access'))
+  @ApiBody({
+    type: UploadImageDTO,
+    description: 'Upload product image',
+  })
   @ApiOperation({ summary: '상품 이미지 업로드' })
   @ApiOkResponse({ description: 'Success' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
