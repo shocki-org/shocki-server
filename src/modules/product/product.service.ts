@@ -5,13 +5,17 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 
 import { PrismaService } from 'src/common/modules/prisma/prisma.service';
 
+import { BlockchainService } from '../blockchain/blockchain.service';
 import { CreateProductDTO } from './dto/create.product.dto';
 import { CreateProductQnADTO } from './dto/create.qna.dto';
 import { GetProductDTO } from './dto/get.product.dto';
 
 @Injectable()
 export class ProductService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly blockchainService: BlockchainService,
+  ) {}
 
   async createTestProduct(userId: string) {
     return this.prisma.product
@@ -127,6 +131,26 @@ export class ProductService {
         },
       },
     });
+
+    const length = await this.prisma.product.count();
+
+    // connect s3
+    const address = await this.blockchainService.create(
+      dto.name,
+      `SH${length}`,
+      'https://ipfs.io/ipfs/QmZzv1Q2',
+    );
+
+    await this.prisma.product.update({
+      where: {
+        id: product.id,
+      },
+      data: {
+        tokenAddress: address,
+      },
+    });
+
+    return product;
   }
 
   async getProduct(userId: string, productId: string): Promise<GetProductDTO> {
