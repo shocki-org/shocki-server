@@ -94,7 +94,7 @@ model Product {
   ownerId                    String
   user                       User                         @relation(fields: [ownerId], references: [id], onDelete: Restrict)
   name                       String
-  image                      String
+  image                      String?
   detailImage                String
   type                       ProductType                  @default(FUNDING)
   currentAmount              Int
