@@ -1,3 +1,5 @@
+import { ProductType } from '@prisma/client';
+
 import { Body, Controller, Get, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
@@ -7,6 +9,7 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -79,10 +82,17 @@ export class ProductController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('access'))
   @ApiOperation({ summary: '상품들 가져오기' })
+  @ApiQuery({
+    name: 'type',
+    description: 'Product type (설정하지 않으면 모두)',
+    required: false,
+    enum: ProductType,
+    enumName: 'ProductType',
+  })
   @ApiOkResponse({ description: 'Product list', type: [GetProductsDTO] })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async getProductList() {
-    return this.productService.getProducts();
+  async getProductList(@Query('type') type: ProductType | undefined) {
+    return this.productService.getProducts(type);
   }
 
   @Get('favorite')

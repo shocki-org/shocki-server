@@ -1,4 +1,4 @@
-import { ProductQnAAuthorType } from '@prisma/client';
+import { ProductQnAAuthorType, ProductType } from '@prisma/client';
 import { DateTime } from 'luxon';
 
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
@@ -255,13 +255,17 @@ export class ProductService {
       });
   }
 
-  async getProducts() {
+  async getProducts(type: ProductType | undefined) {
+    console.log('🚀 ~ ProductService ~ getProducts ~ type:', type);
     return this.prisma.product.findMany({
       select: {
         id: true,
         name: true,
         image: true,
         currentAmount: true,
+      },
+      where: {
+        type: type ? { equals: type } : undefined,
       },
     });
   }
