@@ -300,6 +300,7 @@ export class ProductService {
         name: true,
         image: true,
         currentAmount: true,
+        categories: true,
       },
     });
   }
