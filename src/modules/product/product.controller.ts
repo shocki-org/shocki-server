@@ -52,6 +52,24 @@ export class ProductController {
     return { productId: res.id };
   }
 
+  @Put('image')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('access'))
+  @ApiOperation({ summary: '상품 이미지 업로드' })
+  @ApiOkResponse({ description: 'Success' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiNotFoundResponse({ description: 'Product not found' })
+  @ApiBadRequestResponse({ description: '상품 소유자가 아님' })
+  async uploadProductImage(
+    @CurrentUser() { id }: JwtPayload,
+    @Query('productId') productId: string,
+    @Body('image') image: string,
+  ) {
+    await this.productService.uploadProductImage(id, productId, image);
+
+    return { success: true };
+  }
+
   @Get('list')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('access'))

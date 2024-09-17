@@ -5,6 +5,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { ConfigService } from '@nestjs/config';
 
 import { PrismaService } from 'src/common/modules/prisma/prisma.service';
+import { S3Service } from 'src/common/modules/s3/s3.service';
 
 import { BlockchainService } from '../blockchain/blockchain.service';
 import { CreateProductDTO } from './dto/create.product.dto';
@@ -16,6 +17,7 @@ export class ProductService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly blockchainService: BlockchainService,
+    private readonly s3Service: S3Service,
     private readonly configService: ConfigService<{
       S3_PUBLIC_URL: string;
     }>,
@@ -154,6 +156,31 @@ export class ProductService {
     });
 
     return product;
+  }
+
+  async uploadProductImage(userId: string, productId: string, base64Image: string) {
+    const product = await this.prisma.product.findUnique({
+      where: {
+        id: productId,
+      },
+    });
+
+    if (!product) throw new NotFoundException('상품을 찾을 수 없습니다.');
+    if (product.ownerId !== userId) throw new BadRequestException('상품 소유자가 아닙니다.');
+
+    // connect s3
+    const key = `${product.id}/1.png`;
+
+    const url = await this.s3Service.uploadImage(key, base64Image);
+
+    return this.prisma.product.update({
+      where: {
+        id: productId,
+      },
+      data: {
+        image: url,
+      },
+    });
   }
 
   async getProduct(userId: string, productId: string): Promise<GetProductDTO> {
