@@ -142,7 +142,7 @@ export class ProductService {
     // connect s3
     const address = await this.blockchainService.create(
       dto.name,
-      `SH${length}`,
+      `SHO${length}`,
       `${this.configService.get('S3_PUBLIC_URL')}/${product.id}/1.png`,
     );
 
