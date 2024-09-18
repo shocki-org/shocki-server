@@ -138,12 +138,10 @@ export class ProductService {
       },
     });
 
-    const length = await this.prisma.product.count();
-
     // connect s3
     const address = await this.blockchainService.create(
       dto.name,
-      `SHO${length}`,
+      product.id,
       `${this.configService.get('S3_PUBLIC_URL')}/${product.id}/1.png`,
     );
 
