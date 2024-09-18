@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Put, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -14,7 +15,8 @@ import { JwtPayload } from 'src/auth/model/payload.jwt.model';
 import { CurrentUser } from 'src/common';
 
 import { GetUserDTO } from './dto/get.user.dto';
-import { UpdateCreditDTO, UpdateWalletDTO } from './dto/update.user.dto';
+import { PayDTO } from './dto/pay.user.dto';
+import { UpdateWalletDTO } from './dto/update.user.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -65,15 +67,15 @@ export class UserController {
     await this.userService.deleteUser(id);
   }
 
-  @Put('credit')
+  @Post('pay')
   @UseGuards(AuthGuard('access'))
   @ApiBearerAuth()
-  @ApiOperation({ summary: '유저 크레딧 변경' })
+  @ApiOperation({ summary: '크레딧 충전' })
   @ApiOkResponse({ description: 'Success' })
-  @ApiBadRequestResponse({ description: '응답 참조' })
   @ApiNotFoundResponse({ description: 'User not found' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async updateCredit(@CurrentUser() { id }: JwtPayload, @Body() body: UpdateCreditDTO) {
-    await this.userService.updateCredit(id, body.credit);
+  @ApiInternalServerErrorResponse({ description: 'Payment confirmation failed' })
+  async pay(@CurrentUser() { id }: JwtPayload, @Body() dto: PayDTO) {
+    await this.userService.pay(id, dto);
   }
 }

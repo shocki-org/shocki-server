@@ -9,6 +9,8 @@ import {
 
 import { PrismaService } from 'src/common/modules/prisma/prisma.service';
 
+import { PayDTO } from './dto/pay.user.dto';
+
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
@@ -26,6 +28,48 @@ export class UserService {
     if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
 
     return user;
+  }
+
+  async pay(userId: string, dto: PayDTO) {
+    const url = 'https://api.tosspayments.com/v1/payments/confirm';
+    const options = {
+      method: 'POST',
+      headers: {
+        Authorization: 'Basic dGVzdF9za196WExrS0V5cE5BcldtbzUwblgzbG1lYXhZRzVSOg==',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(dto),
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const data = await response.json();
+      const { totalAmount } = data as { totalAmount: number };
+      if (!response.ok)
+        throw new InternalServerErrorException(data.message || 'Payment confirmation failed');
+
+      await this.prisma.userAccount
+        .update({
+          where: {
+            id: userId,
+          },
+          data: {
+            credit: {
+              increment: totalAmount,
+            },
+          },
+        })
+        .catch((error) => {
+          if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === 'P2025') {
+              throw new NotFoundException('사용자를 찾을 수 없습니다.');
+            }
+          }
+        });
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException('Payment confirmation failed');
+    }
   }
 
   async updateWalletAddress(id: string, walletAddress: string) {
