@@ -173,7 +173,7 @@ export class ProductController {
   @ApiOkResponse({ description: 'Success' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBadRequestResponse({ description: 'Not enough amount' })
-  @ApiNotFoundResponse({ description: 'Product not found' })
+  @ApiNotFoundResponse({ description: 'Product or User not found' })
   async purchaseProductToken(
     @CurrentUser() { id }: JwtPayload,
     @Query('productId') productId: string,

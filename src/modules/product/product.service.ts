@@ -404,7 +404,8 @@ export class ProductService {
       },
     });
 
-    if (!user?.walletAddress) throw new BadRequestException('지갑 주소가 없습니다.');
+    if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
+    if (!user.walletAddress) throw new BadRequestException('지갑 주소가 없습니다.');
 
     if (product.currentAmount * amount < (user?.credit ?? 0))
       throw new BadRequestException('잔액이 부족합니다.');
@@ -414,7 +415,7 @@ export class ProductService {
         id: userId,
       },
       data: {
-        credit: user!.credit - product.currentAmount * amount,
+        credit: user.credit - product.currentAmount * amount,
       },
     });
 
