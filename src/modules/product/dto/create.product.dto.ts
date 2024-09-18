@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client';
-import { IsArray, IsDateString, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsArray, IsDateString, IsNotEmpty, IsNumber, IsString, Matches } from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -27,6 +27,15 @@ export class CreateProductDTO implements Partial<Prisma.ProductCreateInput> {
     description: '목표가',
   })
   targetAmount: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  @Matches('/^(0(.d)?|1(.0)?)$/')
+  @ApiProperty({
+    example: '0.5',
+    description: '배분율',
+  })
+  distributionPercent: number;
 
   @IsDateString()
   @IsNotEmpty()

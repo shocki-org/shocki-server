@@ -36,6 +36,7 @@ export class ProductService {
         detailImage: '상세 이미지 URL',
         currentAmount: dto.currentAmount,
         targetAmount: dto.targetAmount,
+        distributionPercent: dto.distributionPercent,
         fundingEndDate: DateTime.fromISO(dto.fundingEndDate).toJSDate(),
         user: {
           connect: {

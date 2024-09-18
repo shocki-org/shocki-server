@@ -30,6 +30,9 @@ export class ProductDTO implements Product {
   @ApiProperty({ description: '현재 모인금액' })
   collectedAmount: number;
 
+  @ApiProperty({ description: '배분율' })
+  distributionPercent: number;
+
   @ApiProperty({ description: '펀딩 종료일' })
   fundingEndDate: Date;
 
