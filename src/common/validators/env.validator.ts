@@ -77,6 +77,10 @@ class EnvironmentVariables {
   @IsString()
   @IsNotEmpty()
   S3_ENDPOINT: string;
+
+  @IsString()
+  @IsNotEmpty()
+  KAKAO_REST_API_KEY: string;
 }
 
 export function validate(config: Record<string, unknown>) {
