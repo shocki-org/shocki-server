@@ -6,7 +6,10 @@ import { ApiProperty } from '@nestjs/swagger';
 export class OAuthDTO {
   @IsString()
   @IsNotEmpty()
-  @ApiProperty()
+  @ApiProperty({
+    description: 'OAuth Provider',
+    enum: Provider,
+  })
   provider: Provider;
 
   @IsString()
