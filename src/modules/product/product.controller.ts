@@ -99,7 +99,7 @@ export class ProductController {
   @UseGuards(AuthGuard('access'))
   @ApiBearerAuth()
   @ApiOperation({ summary: '좋아요 목록 불러오기' })
-  @ApiOkResponse({ description: 'Favorite products', type: [GetProductsDTO] })
+  @ApiOkResponse({ description: 'Favorite products', type: [SearchProductDTO] })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async getFavoriteProducts(@CurrentUser() { id }: JwtPayload) {
     return this.productService.getFavoriteProducts(id);

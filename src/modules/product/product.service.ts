@@ -295,6 +295,7 @@ export class ProductService {
         id: true,
         name: true,
         image: true,
+        type: true,
         currentAmount: true,
       },
       where: {
