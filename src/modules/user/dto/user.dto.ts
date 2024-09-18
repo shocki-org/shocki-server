@@ -2,7 +2,7 @@ import { $Enums, User } from '@prisma/client';
 
 import { ApiProperty } from '@nestjs/swagger';
 
-export class UserDTO implements Omit<User, 'password'> {
+export class UserDTO implements Partial<User> {
   @ApiProperty({ description: '유저 ID' })
   id: string;
 
