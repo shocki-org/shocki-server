@@ -1,7 +1,12 @@
 import { ProductQnAAuthorType, ProductType } from '@prisma/client';
 import { DateTime } from 'luxon';
 
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { PrismaService } from 'src/common/modules/prisma/prisma.service';
@@ -22,90 +27,6 @@ export class ProductService {
       S3_PUBLIC_URL: string;
     }>,
   ) {}
-
-  async createTestProduct(userId: string) {
-    return this.prisma.product
-      .create({
-        data: {
-          user: {
-            connect: {
-              id: userId,
-            },
-          },
-          name: '상품 이름',
-          image: '상품 이미지 URL',
-          detailImage: '상세 이미지 URL',
-          type: 'FUNDING',
-          currentAmount: 13000,
-          targetAmount: 20000,
-          collectedAmount: 0,
-          fundingEndDate: DateTime.now().plus({ days: 7 }).toJSDate(),
-          fundingLog: {
-            create: [
-              {
-                amount: 10000,
-                user: {
-                  connect: {
-                    id: userId,
-                  },
-                },
-                createdAt: DateTime.now().minus({ days: 1 }).toJSDate(),
-              },
-              {
-                amount: 13000,
-                user: {
-                  connect: {
-                    id: userId,
-                  },
-                },
-                createdAt: DateTime.now().toJSDate(),
-              },
-            ],
-          },
-          productQnA: {
-            create: [
-              {
-                content: '상품 문의 1',
-                authorType: 'BUYER',
-                user: {
-                  connect: {
-                    id: userId,
-                  },
-                },
-              },
-              {
-                content: '상품 답변 1',
-                authorType: 'SELLER',
-                user: {
-                  connect: {
-                    id: userId,
-                  },
-                },
-              },
-            ],
-          },
-          categories: {
-            create: [
-              {
-                category: {
-                  create: {
-                    name: 'test category 1',
-                  },
-                },
-              },
-              {
-                category: {
-                  create: {
-                    name: 'test category 2',
-                  },
-                },
-              },
-            ],
-          },
-        },
-      })
-      .then((product) => console.log(product.id));
-  }
 
   async createProduct(userId: string, dto: CreateProductDTO) {
     const product = await this.prisma.product.create({
@@ -395,48 +316,110 @@ export class ProductService {
       },
     });
 
-    if (!product || !product.tokenAddress) throw new NotFoundException('상품을 찾을 수 없습니다.');
+    if (!product) throw new NotFoundException('상품을 찾을 수 없습니다.');
+    if (!product.tokenAddress) throw new InternalServerErrorException('토큰 주소가 없습니다.');
 
-    const user = await this.prisma.userAccount.findUnique({
+    const user = await this.prisma.user.findUnique({
+      select: {
+        userAccount: {
+          select: {
+            id: true,
+            credit: true,
+            walletAddress: true,
+          },
+        },
+      },
       where: {
         id: userId,
       },
     });
 
     if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
-    if (!user.walletAddress) throw new BadRequestException('지갑 주소가 없습니다.');
+    if (!user.userAccount) throw new InternalServerErrorException('사용자 어카운트가 없습니다.');
+    if (!user.userAccount.walletAddress) throw new BadRequestException('지갑 주소가 없습니다.');
 
-    if (product.currentAmount * amount < (user?.credit ?? 0))
+    if (product.currentAmount * amount > (user.userAccount.credit ?? 0))
       throw new BadRequestException('잔액이 부족합니다.');
 
     await this.prisma.userAccount.update({
       where: {
-        id: userId,
+        id: user.userAccount.id,
       },
       data: {
-        credit: user.credit - product.currentAmount * amount,
+        credit: user.userAccount.credit - product.currentAmount * amount,
       },
     });
 
-    await this.prisma.product.update({
-      where: {
-        id: productId,
-      },
-      data: {
-        fundingLog: {
-          create: {
-            amount,
-            user: {
+    const userTokenBalance = await this.prisma.userTokenBalancesOnProduct
+      .findFirstOrThrow({
+        where: {
+          AND: [
+            {
+              productId,
+            },
+            {
+              userAccountId: user.userAccount.id,
+            },
+          ],
+        },
+      })
+      .catch(() =>
+        this.prisma.userTokenBalancesOnProduct.create({
+          data: {
+            product: {
               connect: {
-                id: userId,
+                id: productId,
+              },
+            },
+            userAccount: {
+              connect: {
+                id: user.userAccount!.id,
               },
             },
           },
-        },
-      },
-    });
+        }),
+      );
 
-    await this.blockchainService.transfer(user.walletAddress, amount, product.tokenAddress);
+    await this.prisma.userTokenBalancesOnProduct
+      .update({
+        where: {
+          id: userTokenBalance.id,
+        },
+        data: {
+          token: {
+            increment: amount,
+          },
+        },
+      })
+      .then(() =>
+        this.prisma.product.update({
+          where: {
+            id: productId,
+          },
+          data: {
+            collectedAmount: {
+              increment: product.currentAmount * amount,
+            },
+            fundingLog: {
+              create: {
+                amount,
+                price: product.currentAmount,
+                userTokenBalance: {
+                  connect: {
+                    id: userTokenBalance.id,
+                  },
+                },
+              },
+            },
+          },
+        }),
+      );
+
+    await this.blockchainService.transfer(
+      user.userAccount.walletAddress,
+      amount,
+      product.tokenAddress,
+    );
   }
 
   // async sellProductToken(userId: string, productId: string, amount: number) {}
