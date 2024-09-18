@@ -29,7 +29,6 @@ model User {
   address          Address[]
   alert            Alert[]
   productQnA       ProductQnA[]
-  fundingLog       FundingLog[]
   userAccount      UserAccount?
   product          Product[]
   favoriteProducts UserFavorite[]
@@ -113,13 +112,14 @@ model Product {
 }
 
 model FundingLog {
-  id        Int      @id @default(autoincrement())
-  productId String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  amount    Int
-  createdAt DateTime @default(now())
+  id                 Int                         @id @default(autoincrement())
+  productId          String
+  product            Product                     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userTokenBalanceId String?
+  userTokenBalance   UserTokenBalancesOnProduct? @relation(fields: [userTokenBalanceId], references: [id], onDelete: SetNull)
+  amount             Int
+  price              Int
+  createdAt          DateTime                    @default(now())
 }
 
 model CategoriesOnProduct {
@@ -149,11 +149,12 @@ model ProductQnA {
 }
 
 model UserTokenBalancesOnProduct {
-  id            String      @id @default(uuid())
+  id            String       @id @default(uuid())
   userAccountId String
-  userAccount   UserAccount @relation(fields: [userAccountId], references: [id], onDelete: Restrict)
+  userAccount   UserAccount  @relation(fields: [userAccountId], references: [id], onDelete: Restrict)
   productId     String
-  product       Product     @relation(fields: [productId], references: [id], onDelete: Restrict)
-  token         Int
-  createdAt     DateTime    @default(now())
+  product       Product      @relation(fields: [productId], references: [id], onDelete: Restrict)
+  token         Int          @default(0)
+  createdAt     DateTime     @default(now())
+  FundingLog    FundingLog[]
 }
