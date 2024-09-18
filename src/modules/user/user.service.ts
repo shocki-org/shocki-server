@@ -35,7 +35,7 @@ export class UserService {
     const options = {
       method: 'POST',
       headers: {
-        Authorization: 'Basic dGVzdF9za196WExrS0V5cE5BcldtbzUwblgzbG1lYXhZRzVSOg==',
+        Authorization: 'Basic dGVzdF9za196WExrS0V5cE5BcldtbzUwblgzbG1lYXhZRzVSOg==', // Test API Key
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(dto),
