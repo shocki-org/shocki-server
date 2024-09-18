@@ -37,8 +37,8 @@ const config: HardhatUserConfig = {
     ],
   },
   paths: {
-    sources: './src/modules/blockchain/contracts',
-    artifacts: './src/modules/blockchain/artifacts/artifacts',
+    sources: './contracts',
+    artifacts: './artifacts/artifacts',
   },
 };
 
