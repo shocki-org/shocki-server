@@ -130,4 +130,23 @@ export class UserService {
 
     return res;
   }
+
+  async updateFCMToken(id: string, fcmToken: string) {
+    await this.prisma.user
+      .update({
+        where: {
+          id,
+        },
+        data: {
+          fcmToken,
+        },
+      })
+      .catch((error) => {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+          if (error.code === 'P2025') {
+            throw new NotFoundException('사용자를 찾을 수 없습니다.');
+          }
+        }
+      });
+  }
 }
