@@ -107,6 +107,7 @@ model Product {
   categories                 CategoriesOnProduct[]
   userTokenBalancesOnProduct UserTokenBalancesOnProduct[]
   userFavorite               UserFavorite[]
+  createdAt                  DateTime                     @default(now())
 }
 
 model FundingLog {
