@@ -28,12 +28,12 @@ export class CreateProductDTO implements Partial<Prisma.ProductCreateInput> {
   })
   targetAmount: number;
 
-  @IsNumber()
   @IsNotEmpty()
-  @Matches('/^(0(.d)?|1(.0)?)$/')
+  @Matches('^(0(.\\d)?|1(.0)?)$', 'g', { message: 'Invalid distribution percent' })
   @ApiProperty({
     example: '0.5',
     description: '배분율',
+    type: String,
   })
   distributionPercent: number;
 
