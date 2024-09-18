@@ -78,4 +78,15 @@ export class UserController {
   async pay(@CurrentUser() { id }: JwtPayload, @Body() dto: PayDTO) {
     await this.userService.pay(id, dto);
   }
+
+  @Put('fcm')
+  @UseGuards(AuthGuard('access'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'FCM 토큰 저장' })
+  @ApiOkResponse({ description: 'Success' })
+  @ApiNotFoundResponse({ description: 'User not found' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  async updateFCMToken(@CurrentUser() { id }: JwtPayload, @Body('fcmToken') fcmToken: string) {
+    await this.userService.updateFCMToken(id, fcmToken);
+  }
 }
