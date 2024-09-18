@@ -35,6 +35,9 @@ export class ProductDTO implements Product {
 
   @ApiProperty({ description: '토큰 주소' })
   tokenAddress: string;
+
+  @ApiProperty({ description: '생성일' })
+  createdAt: Date;
 }
 
 export class ProductQnADTO implements Partial<ProductQnA> {
