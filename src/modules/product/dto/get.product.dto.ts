@@ -20,9 +20,7 @@ export class GetProductDTO extends ProductDTO {
   userFavorite: boolean;
 }
 
-export class GetProductsDTO extends PickType(ProductDTO, [
-  'id',
-  'name',
-  'image',
-  'currentAmount',
-]) {}
+export class GetProductsDTO extends PickType(ProductDTO, ['id', 'name', 'image', 'currentAmount']) {
+  @ApiProperty({ description: '카테고리 ID' })
+  categoryId: string;
+}

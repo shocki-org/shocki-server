@@ -10,7 +10,7 @@ import { S3Service } from 'src/common/modules/s3/s3.service';
 import { BlockchainService } from '../blockchain/blockchain.service';
 import { CreateProductDTO } from './dto/create.product.dto';
 import { CreateProductQnADTO } from './dto/create.qna.dto';
-import { GetProductDTO } from './dto/get.product.dto';
+import { GetProductDTO, GetProductsDTO } from './dto/get.product.dto';
 
 @Injectable()
 export class ProductService {
@@ -257,18 +257,36 @@ export class ProductService {
 
   async getProducts(type: ProductType | undefined) {
     console.log('🚀 ~ ProductService ~ getProducts ~ type:', type);
-    return this.prisma.product.findMany({
-      select: {
-        id: true,
-        name: true,
-        image: true,
-        currentAmount: true,
-        categories: true,
-      },
-      where: {
-        type: type ? { equals: type } : undefined,
-      },
-    });
+    return this.prisma.product
+      .findMany({
+        select: {
+          id: true,
+          name: true,
+          image: true,
+          currentAmount: true,
+          categories: {
+            select: {
+              category: {
+                select: {
+                  id: true,
+                },
+              },
+            },
+          },
+        },
+        where: {
+          type: type ? { equals: type } : undefined,
+        },
+      })
+      .then((product) => product.map((p) => ({ ...p, categoryId: p.categories[0].category.id }))) // 0번째 카테고리 ID만 가져오기
+      .then((product) =>
+        product.map((p) => {
+          const copy: { [key: string]: any } = { ...p };
+          delete copy['categories'];
+
+          return copy as unknown as GetProductsDTO;
+        }),
+      );
   }
 
   async getFavoriteProducts(userId: string) {
