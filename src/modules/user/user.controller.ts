@@ -3,6 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiBody,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -14,6 +15,7 @@ import {
 import { JwtPayload } from 'src/auth/model/payload.jwt.model';
 import { CurrentUser } from 'src/common';
 
+import { FCMUserDTO } from './dto/fcm.user.dto';
 import { GetUserDTO } from './dto/get.user.dto';
 import { PayDTO } from './dto/pay.user.dto';
 import { UpdateWalletDTO } from './dto/update.user.dto';
@@ -70,6 +72,9 @@ export class UserController {
   @Post('pay')
   @UseGuards(AuthGuard('access'))
   @ApiBearerAuth()
+  @ApiBody({
+    type: PayDTO,
+  })
   @ApiOperation({ summary: '크레딧 충전' })
   @ApiOkResponse({ description: 'Success' })
   @ApiNotFoundResponse({ description: 'User not found' })
@@ -82,6 +87,9 @@ export class UserController {
   @Put('fcm')
   @UseGuards(AuthGuard('access'))
   @ApiBearerAuth()
+  @ApiBody({
+    type: FCMUserDTO,
+  })
   @ApiOperation({ summary: 'FCM 토큰 저장' })
   @ApiOkResponse({ description: 'Success' })
   @ApiNotFoundResponse({ description: 'User not found' })
