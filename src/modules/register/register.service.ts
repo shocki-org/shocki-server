@@ -3,6 +3,7 @@ import { OAuth2Client } from 'google-auth-library';
 
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import {
+  BadRequestException,
   ConflictException,
   Inject,
   Injectable,
@@ -10,6 +11,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 import { AuthService } from 'src/auth/auth.service';
 import { CoolsmsService } from 'src/common/modules/coolsms/coolsms.service';
@@ -31,6 +33,12 @@ export class RegisterService {
     private readonly coolsmsService: CoolsmsService,
     private readonly authService: AuthService,
     private readonly alertService: AlertService,
+    private readonly configService: ConfigService<
+      {
+        TEST_KEY: string;
+      },
+      true
+    >,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {
     this.oAuth2Client = new OAuth2Client();
@@ -82,7 +90,7 @@ export class RegisterService {
 
     switch (dto.provider) {
       case Provider.KAKAO:
-        if (!dto.accessToken) throw new UnauthorizedException('Kakao accessToken is required');
+        if (!dto.accessToken) throw new BadRequestException('Kakao accessToken is required');
         const kakaoUser = await this.getKakaoUser(dto.accessToken);
         oauthUser = {
           provider: Provider.KAKAO,
@@ -91,7 +99,7 @@ export class RegisterService {
 
         break;
       case Provider.GOOGLE:
-        if (!dto.accessToken) throw new UnauthorizedException('Google accessToken is required');
+        if (!dto.accessToken) throw new BadRequestException('Google accessToken is required');
         const googleUser = await this.getGoogleUser(dto.accessToken);
         oauthUser = {
           provider: Provider.GOOGLE,
@@ -101,13 +109,23 @@ export class RegisterService {
         break;
       case Provider.PHONE:
         if (!dto.phone || !dto.password)
-          throw new UnauthorizedException('Phone and password are required');
+          throw new BadRequestException('Phone and password are required');
         oauthUser = {
           provider: Provider.PHONE,
           providerId: dto.phone!,
         };
 
         break;
+      case Provider.TEST:
+        if (!dto.accessToken || !dto.phone || !dto.password)
+          throw new BadRequestException('Test provider requires all fields');
+        if (dto.accessToken !== this.configService.get('TEST_KEY'))
+          throw new UnauthorizedException('Test accessToken is incorrect');
+
+        oauthUser = {
+          provider: Provider.TEST,
+          providerId: dto.phone,
+        };
     }
 
     const user = await this.authService.findUserByProvider(
