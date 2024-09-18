@@ -1,5 +1,5 @@
 import { Provider } from '@prisma/client';
-import { IsEmpty, IsNotEmpty, IsString, Matches } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -17,7 +17,7 @@ export class OAuthDTO {
   accessToken?: string;
 
   @IsString()
-  @IsEmpty()
+  @IsOptional()
   @Matches('^[+]8210[0-9]{8}$', 'g', { message: 'Invalid phone number' })
   @ApiProperty({ required: false, nullable: true })
   phone?: string;
