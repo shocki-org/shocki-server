@@ -13,6 +13,7 @@ export class OAuthDTO {
   provider: Provider;
 
   @IsString()
+  @IsOptional()
   @ApiProperty({ required: false, nullable: true })
   accessToken?: string;
 
@@ -23,6 +24,7 @@ export class OAuthDTO {
   phone?: string;
 
   @IsString()
+  @IsOptional()
   @ApiProperty({ required: false, nullable: true })
   password?: string;
 }
