@@ -30,7 +30,12 @@ export class UserController {
   @ApiNotFoundResponse({ description: 'User not found' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async getUser(@CurrentUser() { id }: JwtPayload) {
-    return this.userService.getUser(id);
+    return this.userService.getUser(id).then((user) => {
+      return {
+        ...user,
+        settlementAmount: 0, // 실제 정산 예정 금액으로 변경
+      };
+    });
   }
 
   @Put('address')
