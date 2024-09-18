@@ -1,5 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
   ApiBody,
   ApiConflictResponse,
   ApiInternalServerErrorResponse,
@@ -30,8 +31,9 @@ export class RegisterController {
   })
   @ApiOperation({ summary: 'Login (OAuth and Phone)' })
   @ApiOkResponse({ description: 'Success', type: OAuthResponseDTO })
-  @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
   @ApiNotFoundResponse({ description: 'User not found (Phone)' })
+  @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
+  @ApiBadRequestResponse({ description: 'Invalid input' })
   @ApiInternalServerErrorResponse({
     description: 'User password is not set (Phone) or Internal server error',
   })
