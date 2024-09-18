@@ -17,6 +17,7 @@ enum Provider {
   GOOGLE
   KAKAO
   PHONE
+  TEST
 }
 
 model User {
