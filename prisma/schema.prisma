@@ -24,6 +24,7 @@ model User {
   provider         Provider
   providerId       String
   password         String?
+  fcmToken         String?
   address          Address[]
   alert            Alert[]
   productQnA       ProductQnA[]
