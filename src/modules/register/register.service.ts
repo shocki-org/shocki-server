@@ -117,14 +117,14 @@ export class RegisterService {
 
         break;
       case Provider.TEST:
-        if (!dto.accessToken || !dto.phone)
+        if (!dto.accessToken || !dto.password)
           throw new BadRequestException('Test provider requires all fields');
         if (dto.accessToken !== this.configService.get('TEST_KEY'))
           throw new UnauthorizedException('Test accessToken is incorrect');
 
         oauthUser = {
           provider: Provider.TEST,
-          providerId: dto.phone,
+          providerId: dto.password,
         };
     }
 
