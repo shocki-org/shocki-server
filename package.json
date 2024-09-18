@@ -44,6 +44,7 @@
     "class-validator": "^0.14.1",
     "coolsms-node-sdk": "^2.1.0",
     "ethers": "^5.0.0",
+    "firebase-admin": "^12.5.0",
     "google-auth-library": "^9.14.1",
     "hardhat": "^2.22.10",
     "import-to-array": "^1.0.0",
