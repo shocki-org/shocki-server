@@ -111,6 +111,7 @@ export class ProductService {
     const product = await this.prisma.product.create({
       data: {
         name: dto.name,
+        image: `${this.configService.get('S3_PUBLIC_URL')}/cover.png`,
         detailImage: '상세 이미지 URL',
         currentAmount: dto.currentAmount,
         targetAmount: dto.targetAmount,
