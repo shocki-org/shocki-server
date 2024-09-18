@@ -176,9 +176,13 @@ export class RegisterService {
   }
 
   async getGoogleUser(accessToken: string) {
-    const ticket = await this.oAuth2Client.verifyIdToken({
-      idToken: accessToken,
-    });
+    const ticket = await this.oAuth2Client
+      .verifyIdToken({
+        idToken: accessToken,
+      })
+      .catch(() => {
+        throw new UnauthorizedException('Google login failed');
+      });
     const payload = ticket.getPayload();
 
     if (!payload) {
