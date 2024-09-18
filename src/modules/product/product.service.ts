@@ -263,6 +263,7 @@ export class ProductService {
         name: true,
         image: true,
         currentAmount: true,
+        categories: true,
       },
       where: {
         type: type ? { equals: type } : undefined,
