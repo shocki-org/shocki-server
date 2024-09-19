@@ -177,7 +177,6 @@ export class ProductService {
   }
 
   async getProducts(type: ProductType | undefined) {
-    console.log('🚀 ~ ProductService ~ getProducts ~ type:', type);
     return this.prisma.product
       .findMany({
         select: {
@@ -342,85 +341,85 @@ export class ProductService {
     if (product.currentAmount * amount > (user.userAccount.credit ?? 0))
       throw new BadRequestException('잔액이 부족합니다.');
 
-    await this.prisma.userAccount.update({
-      where: {
-        id: user.userAccount.id,
-      },
-      data: {
-        credit: user.userAccount.credit - product.currentAmount * amount,
-      },
-    });
-
-    const userTokenBalance = await this.prisma.userTokenBalancesOnProduct
-      .findFirstOrThrow({
+    return this.prisma.$transaction(async (tx) => {
+      await tx.userAccount.update({
         where: {
-          AND: [
-            {
-              productId,
-            },
-            {
-              userAccountId: user.userAccount.id,
-            },
-          ],
+          id: user.userAccount!.id,
         },
-      })
-      .catch(() =>
-        this.prisma.userTokenBalancesOnProduct.create({
-          data: {
-            product: {
-              connect: {
-                id: productId,
-              },
-            },
-            userAccount: {
-              connect: {
-                id: user.userAccount!.id,
-              },
-            },
-          },
-        }),
-      );
+        data: {
+          credit: user.userAccount!.credit - product.currentAmount * amount,
+        },
+      });
 
-    await this.prisma.userTokenBalancesOnProduct
-      .update({
+      const userTokenBalance = await tx.userTokenBalancesOnProduct
+        .findFirstOrThrow({
+          where: {
+            AND: [
+              {
+                productId,
+              },
+              {
+                userAccountId: user.userAccount!.id,
+              },
+            ],
+          },
+        })
+        .catch(() =>
+          tx.userTokenBalancesOnProduct.create({
+            data: {
+              product: {
+                connect: {
+                  id: productId,
+                },
+              },
+              userAccount: {
+                connect: {
+                  id: user.userAccount!.id,
+                },
+              },
+            },
+          }),
+        );
+
+      await tx.userTokenBalancesOnProduct.update({
         where: {
           id: userTokenBalance.id,
         },
         data: {
           token: {
-            increment: amount,
+            increment: Number(amount),
           },
         },
-      })
-      .then(() =>
-        this.prisma.product.update({
-          where: {
-            id: productId,
+      });
+
+      await tx.product.update({
+        where: {
+          id: productId,
+        },
+        data: {
+          collectedAmount: {
+            increment: product.currentAmount * amount,
           },
-          data: {
-            collectedAmount: {
-              increment: product.currentAmount * amount,
-            },
-            fundingLog: {
-              create: {
-                amount,
-                price: product.currentAmount,
-                userTokenBalance: {
-                  connect: {
-                    id: userTokenBalance.id,
-                  },
+          fundingLog: {
+            create: {
+              amount: Number(amount),
+              price: product.currentAmount,
+              userTokenBalance: {
+                connect: {
+                  id: userTokenBalance.id,
                 },
               },
             },
           },
-        }),
-      );
+        },
+      });
 
-    await this.blockchainService.transfer(
-      user.userAccount.walletAddress,
-      amount,
-      product.tokenAddress,
-    );
+      await this.blockchainService.transfer(
+        user.userAccount!.walletAddress!,
+        amount,
+        product.tokenAddress!,
+      );
+    });
   }
 
   // async sellProductToken(userId: string, productId: string, amount: number) {}
