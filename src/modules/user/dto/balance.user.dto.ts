@@ -2,6 +2,7 @@ import { IsNumber, IsObject } from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
 
+import { GetSettlementUserDto } from './settlement.user.dto';
 import { TokenBalanceDTO } from './token.user.dto';
 
 export class GetUserBalanceDTO {
@@ -18,7 +19,7 @@ export class GetUserBalanceDTO {
   })
   tokenBalances: TokenBalanceDTO[];
 
-  @IsNumber()
-  @ApiProperty({ description: '정산 예정 금액' })
-  settlementAmount: number;
+  @IsObject()
+  @ApiProperty({ description: '정산', type: GetSettlementUserDto })
+  settlement: GetSettlementUserDto;
 }

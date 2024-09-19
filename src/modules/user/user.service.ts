@@ -1,4 +1,5 @@
 import { Prisma } from '@prisma/client';
+import { DateTime } from 'luxon';
 
 import {
   BadRequestException,
@@ -10,6 +11,7 @@ import {
 import { PrismaService } from 'src/common/modules/prisma/prisma.service';
 
 import { PayDTO } from './dto/pay.user.dto';
+import { SettlementProductDTO } from './dto/settlement.user.dto';
 
 @Injectable()
 export class UserService {
@@ -76,7 +78,140 @@ export class UserService {
     return {
       credit,
       tokenBalances,
-      settlementAmount: 0, // 실제 정산 예정 금액으로 변경
+      settlement: await this.settlement(userId),
+    };
+  }
+
+  async settlement(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      select: {
+        id: true,
+        userAccount: {
+          select: {
+            id: true,
+            userTokenBalancesOnProduct: {
+              select: {
+                token: true,
+                product: {
+                  select: {
+                    id: true,
+                    distributionPercent: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      where: {
+        id: userId,
+      },
+    });
+    if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
+    if (!user.userAccount) throw new NotFoundException('사용자 어카운트를 찾을 수 없습니다.');
+
+    const marketPurchases = await this.prisma.userMarketPurchase
+      .findMany({
+        select: {
+          amount: true,
+          price: true,
+          createdAt: true,
+          product: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+              createdAt: true,
+              fundingEndDate: true,
+            },
+          },
+        },
+        where: {
+          product: {
+            OR: user.userAccount.userTokenBalancesOnProduct.map((productToken) => ({
+              id: productToken.product.id,
+            })),
+          },
+        },
+      })
+      .then((purchases) =>
+        purchases.map((purchase) => {
+          const now = DateTime.now().setZone('utc').set({
+            hour: 0,
+            minute: 0,
+            second: 0,
+            millisecond: 0,
+          });
+          const startMarketAt = DateTime.fromJSDate(purchase.product.fundingEndDate)
+            .setZone('utc')
+            .set({
+              hour: 0,
+              minute: 0,
+              second: 0,
+              millisecond: 0,
+            });
+          const purchasedAt = DateTime.fromJSDate(purchase.createdAt).setZone('utc').set({
+            hour: 0,
+            minute: 0,
+            second: 0,
+            millisecond: 0,
+          });
+
+          const daysDiff = now.diff(startMarketAt, 'days').days;
+
+          const quotient = Math.floor(daysDiff / 14);
+          const intervalList = Array.from({ length: quotient + 2 }, (_, i) => i * 14);
+
+          return {
+            ...purchase,
+            purchasedAt,
+            intervalList,
+            startMarketAt,
+          };
+        }),
+      )
+      .then((purchases) =>
+        purchases.filter((purchase) => {
+          for (let i = 0; i < purchase.intervalList.length - 1; i++) {
+            if (
+              purchase.intervalList[i] <=
+                purchase.purchasedAt.diff(purchase.startMarketAt, 'days').days &&
+              purchase.purchasedAt.diff(purchase.startMarketAt, 'days').days <
+                purchase.intervalList[i + 1]
+            ) {
+              return true;
+            }
+          }
+        }),
+      );
+
+    let totalSettlementAmount = 0;
+    const settlementProducts: SettlementProductDTO[] = [];
+    for (const purchase of marketPurchases) {
+      const productToken = user.userAccount.userTokenBalancesOnProduct.find(
+        (productToken) => productToken.product.id === purchase.product.id,
+      );
+
+      const settlementAmount =
+        (purchase.amount / 1000) * purchase.price * productToken!.product.distributionPercent;
+      totalSettlementAmount += settlementAmount;
+
+      const settlementDate = purchase.startMarketAt
+        .plus({ days: purchase.intervalList[purchase.intervalList.length - 1] })
+        .toJSDate();
+
+      settlementProducts.push({
+        productId: purchase.product.id,
+        productName: purchase.product.name,
+        productImage: purchase.product.image!,
+        settlementAmount,
+        settlementDate,
+      });
+    }
+
+    return {
+      totalSettlementAmount,
+      settlementProducts,
     };
   }
 
