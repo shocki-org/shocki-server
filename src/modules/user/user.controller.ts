@@ -15,6 +15,8 @@ import {
 import { JwtPayload } from 'src/auth/model/payload.jwt.model';
 import { CurrentUser } from 'src/common';
 
+import { GetUserBalanceDTO } from './dto/balance.user.dto';
+import { GetUserFavoriteDTO } from './dto/favorite.user.dto';
 import { FCMUserDTO } from './dto/fcm.user.dto';
 import { GetUserDTO } from './dto/get.user.dto';
 import { PayDTO } from './dto/pay.user.dto';
@@ -34,12 +36,29 @@ export class UserController {
   @ApiNotFoundResponse({ description: 'User not found' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async getUser(@CurrentUser() { id }: JwtPayload) {
-    return this.userService.getUser(id).then((user) => {
-      return {
-        ...user,
-        settlementAmount: 0, // 실제 정산 예정 금액으로 변경
-      };
-    });
+    return this.userService.getUser(id);
+  }
+
+  @Get('balance')
+  @UseGuards(AuthGuard('access'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '유저 어카운트 정보 가져오기' })
+  @ApiOkResponse({ description: 'Success', type: GetUserBalanceDTO })
+  @ApiNotFoundResponse({ description: 'User not found' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  async getBalance(@CurrentUser() { id }: JwtPayload) {
+    return this.userService.balance(id);
+  }
+
+  @Get('favorite')
+  @UseGuards(AuthGuard('access'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '유저 좋아요 상품 가져오기' })
+  @ApiOkResponse({ description: 'Success', type: [GetUserFavoriteDTO] })
+  @ApiNotFoundResponse({ description: 'User not found' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  async getFavorite(@CurrentUser() { id }: JwtPayload) {
+    return this.userService.favorite(id);
   }
 
   @Put('address')
