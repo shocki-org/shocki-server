@@ -42,7 +42,7 @@ export class UserService {
         id: true,
         userAccount: {
           include: {
-            UserTokenBalancesOnProduct: {
+            userTokenBalancesOnProduct: {
               include: {
                 product: {
                   select: {
@@ -64,7 +64,7 @@ export class UserService {
     if (!user.userAccount) throw new NotFoundException('사용자 어카운트를 찾을 수 없습니다.');
 
     const credit = user.userAccount.credit;
-    const tokenBalances = user.userAccount.UserTokenBalancesOnProduct.map((productToken) => {
+    const tokenBalances = user.userAccount.userTokenBalancesOnProduct.map((productToken) => {
       return {
         tokenAmount: productToken.token,
         productId: productToken.productId,
