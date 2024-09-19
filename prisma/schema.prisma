@@ -41,7 +41,7 @@ model UserAccount {
   credit                     Int                          @default(0)
   walletAddress              String?
   userTokenBalancesOnProduct UserTokenBalancesOnProduct[]
-  userMarketPurchaseLog      UserMarketPurchase[]
+  userMarketPurchase         UserMarketPurchase[]
 }
 
 model UserFavorite {
