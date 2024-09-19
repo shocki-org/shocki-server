@@ -40,7 +40,8 @@ model UserAccount {
   user                       User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
   credit                     Int                          @default(0)
   walletAddress              String?
-  UserTokenBalancesOnProduct UserTokenBalancesOnProduct[]
+  userTokenBalancesOnProduct UserTokenBalancesOnProduct[]
+  userMarketPurchaseLog      UserMarketPurchase[]
 }
 
 model UserFavorite {
@@ -110,6 +111,7 @@ model Product {
   userTokenBalancesOnProduct UserTokenBalancesOnProduct[]
   userFavorite               UserFavorite[]
   createdAt                  DateTime                     @default(now())
+  userMarketPurchase         UserMarketPurchase[]
 }
 
 model FundingLog {
@@ -158,4 +160,24 @@ model UserTokenBalancesOnProduct {
   token         Int          @default(0)
   createdAt     DateTime     @default(now())
   FundingLog    FundingLog[]
+}
+
+enum MarketPurchaseStatus {
+  WAITING_DELIVERY
+  ON_DELIVERY
+  DELIVERED
+}
+
+model UserMarketPurchase {
+  id            String               @id @default(uuid())
+  userAccountId String
+  userAccount   UserAccount          @relation(fields: [userAccountId], references: [id], onDelete: Cascade)
+  productId     String
+  product       Product              @relation(fields: [productId], references: [id], onDelete: NoAction)
+  amount        Int
+  price         Int
+  phone         String
+  address       String
+  type          MarketPurchaseStatus @default(WAITING_DELIVERY)
+  createdAt     DateTime             @default(now())
 }
