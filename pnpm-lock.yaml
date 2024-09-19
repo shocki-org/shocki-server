@@ -114,6 +114,9 @@ importers:
       '@types/bcrypt':
         specifier: ^5.0.2
         version: 5.0.2
+      '@types/chai':
+        specifier: '4'
+        version: 4.3.19
       '@types/express':
         specifier: ^4.17.17
         version: 4.17.21
@@ -123,8 +126,11 @@ importers:
       '@types/luxon':
         specifier: ^3.4.2
         version: 3.4.2
+      '@types/mocha':
+        specifier: ^10.0.8
+        version: 10.0.8
       '@types/node':
-        specifier: ^20.3.1
+        specifier: ^20.16.3
         version: 20.16.3
       '@types/passport-jwt':
         specifier: ^4.0.1
@@ -138,6 +144,9 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^8.0.0
         version: 8.4.0(eslint@8.57.0)(typescript@5.5.4)
+      chai:
+        specifier: '4'
+        version: 4.5.0
       eslint:
         specifier: ^8.42.0
         version: 8.57.0
