@@ -309,6 +309,71 @@ export class ProductService {
     });
   }
 
+  async purchaseMarketProduct(
+    userId: string,
+    dto: { productId: string; amount: number; phone: string; address: string },
+  ) {
+    const user = await this.prisma.user.findUnique({
+      select: {
+        userAccount: {
+          select: {
+            id: true,
+            credit: true,
+            walletAddress: true,
+          },
+        },
+      },
+      where: {
+        id: userId,
+      },
+    });
+    if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
+    if (!user.userAccount) throw new InternalServerErrorException('사용자 어카운트가 없습니다.');
+
+    const product = await this.prisma.product.findUnique({
+      where: {
+        id: dto.productId,
+      },
+    });
+    if (!product) throw new NotFoundException('상품을 찾을 수 없습니다.');
+
+    if (product.type !== ProductType.SELLING)
+      throw new BadRequestException('마켓 상품이 아닙니다.');
+
+    if (product.currentAmount * dto.amount > (user.userAccount.credit ?? 0))
+      throw new BadRequestException('잔액이 부족합니다.');
+
+    return this.prisma.$transaction(async (tx) => {
+      await tx.userAccount.update({
+        where: {
+          id: user.userAccount!.id,
+        },
+        data: {
+          credit: user.userAccount!.credit - product.currentAmount * dto.amount,
+        },
+      });
+
+      await tx.userMarketPurchase.create({
+        data: {
+          phone: dto.phone,
+          address: dto.address,
+          amount: Number(dto.amount),
+          price: product.currentAmount,
+          userAccount: {
+            connect: {
+              id: user.userAccount!.id,
+            },
+          },
+          product: {
+            connect: {
+              id: dto.productId,
+            },
+          },
+        },
+      });
+    });
+  }
+
   async purchaseProductToken(userId: string, productId: string, amount: number) {
     const product = await this.prisma.product.findUnique({
       where: {
