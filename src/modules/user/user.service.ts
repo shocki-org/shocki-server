@@ -17,17 +17,100 @@ export class UserService {
 
   async getUser(userId: string) {
     const user = await this.prisma.user.findUnique({
+      select: {
+        id: true,
+        userAccount: {
+          select: {
+            id: true,
+            credit: true,
+          },
+        },
+      },
       where: {
         id: userId,
-      },
-      include: {
-        userAccount: true,
       },
     });
 
     if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
 
     return user;
+  }
+
+  async balance(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      select: {
+        id: true,
+        userAccount: {
+          include: {
+            UserTokenBalancesOnProduct: {
+              include: {
+                product: {
+                  select: {
+                    name: true,
+                    image: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
+    if (!user.userAccount) throw new NotFoundException('사용자 어카운트를 찾을 수 없습니다.');
+
+    const credit = user.userAccount.credit;
+    const tokenBalances = user.userAccount.UserTokenBalancesOnProduct.map((productToken) => {
+      return {
+        tokenAmount: productToken.token,
+        productId: productToken.productId,
+        productName: productToken.product.name,
+        productImage: productToken.product.image,
+      };
+    });
+
+    return {
+      credit,
+      tokenBalances,
+      settlementAmount: 0, // 실제 정산 예정 금액으로 변경
+    };
+  }
+
+  async favorite(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      select: {
+        id: true,
+        favoriteProducts: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+                currentAmount: true,
+              },
+            },
+          },
+        },
+      },
+      where: {
+        id: userId,
+      },
+    });
+    if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
+
+    const favoriteProducts = user.favoriteProducts.map((favorite) => ({
+      productId: favorite.productId,
+      productName: favorite.product.name,
+      productImage: favorite.product.image,
+      productPrice: favorite.product.currentAmount,
+    }));
+
+    return favoriteProducts;
   }
 
   async pay(userId: string, dto: PayDTO) {
