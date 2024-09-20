@@ -97,7 +97,6 @@ model Product {
   user                       User                         @relation(fields: [ownerId], references: [id], onDelete: Restrict)
   name                       String
   image                      String?
-  detailImage                String
   type                       ProductType                  @default(FUNDING)
   currentAmount              Int
   targetAmount               Int
@@ -112,6 +111,15 @@ model Product {
   userFavorite               UserFavorite[]
   createdAt                  DateTime                     @default(now())
   userMarketPurchase         UserMarketPurchase[]
+  productDetailImage         ProductDetailImage[]
+}
+
+model ProductDetailImage {
+  id        Int     @id @default(autoincrement())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  image     String
+  index     Int
 }
 
 model FundingLog {
