@@ -4,3 +4,4 @@ export * from './user';
 export * from './alert';
 export * from './category';
 export * from './address';
+export * from './declaration';
