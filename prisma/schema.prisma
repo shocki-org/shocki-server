@@ -32,6 +32,7 @@ model User {
   userAccount      UserAccount?
   product          Product[]
   favoriteProducts UserFavorite[]
+  Declaration      Declaration[]
 }
 
 model UserAccount {
@@ -188,4 +189,21 @@ model UserMarketPurchase {
   address       String
   type          MarketPurchaseStatus @default(WAITING_DELIVERY)
   createdAt     DateTime             @default(now())
+  Declaration   Declaration[]
+}
+
+enum DeclarationType {
+  WRONG_PRODUCT
+  MISSING_PRODUCT
+  ETC
+}
+
+model Declaration {
+  id         String             @id @default(uuid())
+  userId     String
+  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  purchaseId String
+  purchase   UserMarketPurchase @relation(fields: [purchaseId], references: [id], onDelete: Restrict)
+  type       DeclarationType
+  createdAt  DateTime           @default(now())
 }
