@@ -18,6 +18,12 @@ export class GetProductDTO extends ProductDTO {
     type: Boolean,
   })
   userFavorite: boolean;
+
+  @ApiProperty({
+    description: '상세 이미지 리스트',
+    type: [String],
+  })
+  detailImages: string[];
 }
 
 export class GetProductsDTO extends PickType(ProductDTO, ['id', 'name', 'image', 'currentAmount']) {
