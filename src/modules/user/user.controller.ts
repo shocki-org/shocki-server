@@ -16,6 +16,7 @@ import { JwtPayload } from 'src/auth/model/payload.jwt.model';
 import { CurrentUser } from 'src/common';
 
 import { GetUserBalanceDTO } from './dto/balance.user.dto';
+import { GetDeliveryStatusDTO } from './dto/delivery.user.dto';
 import { GetUserFavoriteDTO } from './dto/favorite.user.dto';
 import { FCMUserDTO } from './dto/fcm.user.dto';
 import { GetUserDTO } from './dto/get.user.dto';
@@ -48,6 +49,16 @@ export class UserController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async getBalance(@CurrentUser() { id }: JwtPayload) {
     return this.userService.balance(id);
+  }
+
+  @Get('delivery')
+  @UseGuards(AuthGuard('access'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '유저 배송정보 가져오기' })
+  @ApiOkResponse({ description: 'Success', type: GetDeliveryStatusDTO })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  async getDeliveryStatus(@CurrentUser() { id }: JwtPayload) {
+    return this.userService.deliveryStatus(id);
   }
 
   @Get('favorite')
