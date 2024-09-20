@@ -218,6 +218,7 @@ export class UserService {
   async deliveryStatus(userId: string) {
     const purchases = await this.prisma.userMarketPurchase.findMany({
       select: {
+        id: true,
         type: true,
         product: {
           select: {
@@ -237,6 +238,7 @@ export class UserService {
     });
 
     return purchases.map((purchase) => ({
+      purchaseId: purchase.id,
       productId: purchase.product.id,
       productName: purchase.product.name,
       productImage: purchase.product.image,
