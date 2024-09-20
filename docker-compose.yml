@@ -1,10 +1,10 @@
-version: '3'
+version: "3"
 
 services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: packages/server/Dockerfile
     restart: always
     env_file:
       - .env
@@ -17,15 +17,15 @@ services:
     image: postgres:16.4-alpine
     restart: always
     ports:
-      - '5432:5432'
+      - "5432:5432"
     env_file:
       - .env
     volumes:
       - postgres_data:/var/lib/postgresql/data
   redis:
-    image: 'redis:7.2.5'
+    image: "redis:7.2.5"
     ports:
-      - '6379:6379'
+      - "6379:6379"
 
 volumes:
   postgres_data:

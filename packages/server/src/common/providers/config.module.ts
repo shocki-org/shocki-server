@@ -5,7 +5,7 @@ import { validate } from 'src/common';
 
 const options: ConfigModuleOptions = {
   isGlobal: true,
-  envFilePath: `.env.${process.env.NODE_ENV}`,
+  envFilePath: [`.env.${process.env.NODE_ENV}`, `../../.env`, `../../.env.${process.env.NODE_ENV}`],
   validate,
   validationOptions: {
     abortEarly: true,

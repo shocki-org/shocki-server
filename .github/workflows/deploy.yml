@@ -24,7 +24,7 @@ jobs:
             cd /root/shocki-server
             git pull origin main
             pnpm i
-            DATABASE_URL=${{ secrets.DATABASE_URL }} pnpx prisma migrate dev -n init
+            DATABASE_URL=${{ secrets.DATABASE_URL }} pnpx prisma migrate dev -n init --schema /packages/server/prisma/schema.prisma
             docker system prune -af
             docker compose down
             docker compose up -d --build --force-recreate
