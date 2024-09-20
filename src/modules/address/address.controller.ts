@@ -6,7 +6,7 @@ import { AddressService } from './address.service';
 import { AddressResponseDTO } from './dto/address-response.dto';
 
 @ApiTags('address')
-@Controller('address')
+@Controller('Address')
 export class AddressController {
   constructor(private readonly addressService: AddressService) {}
 
