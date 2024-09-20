@@ -33,7 +33,6 @@ export class ProductService {
       data: {
         name: dto.name,
         image: `${this.configService.get('S3_PUBLIC_URL')}/cover.png`,
-        detailImage: '상세 이미지 URL',
         currentAmount: dto.currentAmount,
         targetAmount: dto.targetAmount,
         distributionPercent: Number(dto.distributionPercent),
@@ -142,6 +141,12 @@ export class ProductService {
               },
             },
           },
+          productDetailImage: {
+            select: {
+              image: true,
+              index: true,
+            },
+          },
         },
       })
       .then((product) => {
@@ -154,6 +159,14 @@ export class ProductService {
         return {
           ...product,
           categories: product.categories.map((category) => category.category.name),
+        };
+      })
+      .then((product) => {
+        return {
+          ...product,
+          detailImages: product.productDetailImage
+            .sort((a, b) => a.index - b.index)
+            .map((image) => image.image),
         };
       })
       .then((product) => {
