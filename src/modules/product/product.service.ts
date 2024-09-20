@@ -59,12 +59,18 @@ export class ProductService {
       },
     });
 
-    // connect s3
+    // const productId = 'ad6c2551-6897-4181-a26e-edf67cb6f38d';
+    // const productId = '27bff359-16cd-4419-86dc-255f53c1f7a3';
+
     const address = await this.blockchainService.create(
       dto.name,
+      // productId,
       product.id,
+      // `${this.configService.get('S3_PUBLIC_URL')}/${productId}/1.png`,
       `${this.configService.get('S3_PUBLIC_URL')}/${product.id}/1.png`,
     );
+
+    console.log(address);
 
     await this.prisma.product.update({
       where: {
@@ -74,6 +80,8 @@ export class ProductService {
         tokenAddress: address,
       },
     });
+
+    // return { id: productId };
 
     return product;
   }

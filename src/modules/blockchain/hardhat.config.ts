@@ -1,4 +1,5 @@
 import '@nomicfoundation/hardhat-toolbox';
+import 'dotenv/config';
 import { HardhatUserConfig } from 'hardhat/config';
 
 const config: HardhatUserConfig = {
@@ -18,7 +19,9 @@ const config: HardhatUserConfig = {
   defaultNetwork: 'minato',
   networks: {
     minato: {
-      url: 'https://soneium-minato.rpc.scs.startale.com/?apikey=BFlJo8vAg4VBibKgfmKBvItDiUoQrHxg',
+      // url: 'https://soneium-minato.rpc.scs.startale.com/?apikey=BFlJo8vAg4VBibKgfmKBvItDiUoQrHxg',
+      url: process.env.RPC_URL!,
+      accounts: ['0x' + process.env.DEPLOYER_PRIVATE_KEY!],
     },
   },
   etherscan: {

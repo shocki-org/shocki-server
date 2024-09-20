@@ -1,7 +1,7 @@
-import { Wallet, providers } from 'ethers';
+import { JsonRpcProvider, Wallet } from 'ethers';
 import hre from 'hardhat';
-import { ERC20__factory } from 'typechain-types';
 
+// import { ERC20__factory } from 'typechain-types';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -10,7 +10,7 @@ import ERC721Module from './ignition/modules/ERC721';
 
 @Injectable()
 export class BlockchainService {
-  private provider: providers.JsonRpcProvider;
+  private provider: JsonRpcProvider;
   private deployer: Wallet;
 
   constructor(
@@ -19,7 +19,7 @@ export class BlockchainService {
       DEPLOYER_PRIVATE_KEY: string;
     }>,
   ) {
-    this.provider = new providers.JsonRpcProvider(this.configService.get('RPC_URL')!);
+    this.provider = new JsonRpcProvider(this.configService.get('RPC_URL')!);
     this.deployer = new Wallet(this.configService.get('DEPLOYER_PRIVATE_KEY')!, this.provider);
   }
 
@@ -59,11 +59,11 @@ export class BlockchainService {
   }
 
   async transfer(to: string, amount: number, address: string): Promise<void> {
-    const erc20 = ERC20__factory.connect(address, this.deployer);
+    // const erc20 = ERC20__factory.connect(address, this.deployer);
 
-    const transfer = await erc20.transfer(to, amount);
+    // const transfer = await erc20.transfer(to, amount);
 
-    await transfer.wait();
+    // await transfer.wait();
 
     return;
   }
