@@ -1,12 +1,9 @@
-import { Contract, JsonRpcProvider, Wallet } from 'ethers';
-import hre, { ethers } from 'hardhat';
+import { JsonRpcProvider, Wallet } from 'ethers';
+import { ethers } from 'hardhat';
 
 // import { ERC20__factory } from 'typechain-types';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-
-import ERC20Module from './ignition/modules/ERC20';
-import ERC721Module from './ignition/modules/ERC721';
 
 @Injectable()
 export class BlockchainService {
