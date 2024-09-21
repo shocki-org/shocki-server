@@ -61,14 +61,11 @@ export class BlockchainService {
   async transfer(to: string, amount: number, address: string): Promise<void> {
     const erc20 = await ethers.getContractAt('ShockiToken', address, this.deployer);
 
-    const tx = await erc20.approve(this.deployer.address, ethers.parseUnits(amount.toString(), 18));
-    await tx.wait();
+    await erc20.approve(this.deployer.address, ethers.parseUnits(amount.toString(), 18));
 
-    const transfer = await erc20.transfer(to, ethers.parseUnits(amount.toString(), 18), {
+    await erc20.transfer(to, ethers.parseUnits(amount.toString(), 18), {
       gasLimit: 100000,
     });
-
-    await transfer.wait();
 
     return;
   }
