@@ -8,7 +8,7 @@
   "scripts": {
     "build": "pnpm run build:nest && pnpm run build:copy",
     "build:nest": "nest build",
-    "build:copy": "copyfiles --up 3 src/modules/blockchain/contracts/* dist/src/modules/blockchain && copyfiles --up 3 --all \"src/modules/blockchain/artifacts/**/*\" dist/src/modules/blockchain && copyfiles hardhat.config.js dist",
+    "build:copy": "copyfiles --up 3 src/modules/blockchain/contracts/* dist/src/modules/blockchain && copyfiles --up 3 --all \"src/modules/blockchain/artifacts/**/*\" dist/src/modules/blockchain",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
