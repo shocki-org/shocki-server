@@ -9,7 +9,7 @@ contract ShockiToken is ERC20 {
   address public NFT_ADDRESS;
 
   constructor(string memory name, string memory symbol, address nftAddress) ERC20(name, symbol) {
-    _mint(msg.sender, NFT_MAX_SUPPLY);
+    _mint(msg.sender, NFT_MAX_SUPPLY * 10 ** decimals());
     NFT_ADDRESS = nftAddress;
   }
 }
