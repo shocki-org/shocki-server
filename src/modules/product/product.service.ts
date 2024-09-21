@@ -21,7 +21,7 @@ import { GetProductDTO, GetProductsDTO } from './dto/get.product.dto';
 export class ProductService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly blockchainService: BlockchainService,
+    private readonly blockchain: BlockchainService,
     private readonly s3Service: S3Service,
     private readonly configService: ConfigService<{
       S3_PUBLIC_URL: string;
@@ -59,7 +59,7 @@ export class ProductService {
       },
     });
 
-    const address = await this.blockchainService.create(
+    const address = await this.blockchain.create(
       dto.name,
       product.id.split('-')[0],
       `${this.configService.get('S3_PUBLIC_URL')}/${product.id}/1.png`,
@@ -493,7 +493,11 @@ export class ProductService {
         },
       });
 
-      await this.blockchainService.transfer(
+      await this.blockchain.getRemainingTokens(product.tokenAddress!).then((remaining) => {
+        if (remaining < amount) throw new BadRequestException('남은 토큰이 부족합니다.');
+      });
+
+      await this.blockchain.transfer(
         user.userAccount!.walletAddress!,
         amount,
         product.tokenAddress!,

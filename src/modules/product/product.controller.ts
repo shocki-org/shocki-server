@@ -173,7 +173,7 @@ export class ProductController {
   @ApiOperation({ summary: '펀딩 상품 구매하기' })
   @ApiOkResponse({ description: 'Success' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiBadRequestResponse({ description: 'Not enough amount' })
+  @ApiBadRequestResponse({ description: '돈이 충분하지 않거나 제품에 남은 토큰이 없습니다.' })
   @ApiNotFoundResponse({ description: 'Product or User not found' })
   async purchaseProductToken(
     @CurrentUser() { id }: JwtPayload,
