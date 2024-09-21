@@ -77,4 +77,12 @@ export class BlockchainService {
 
     return Number(ethers.formatUnits(balance, 18));
   }
+
+  async getRemainingTokens(tokenAddress: string): Promise<number> {
+    const erc20 = await ethers.getContractAt('ShockiToken', tokenAddress, this.deployer);
+
+    const balance = await erc20.balanceOf(this.deployer.address);
+
+    return Number(ethers.formatUnits(balance, 18));
+  }
 }
