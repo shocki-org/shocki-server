@@ -56,6 +56,14 @@ class EnvironmentVariables {
 
   @IsString()
   @IsNotEmpty()
+  CONTRACTS_PATH: string;
+
+  @IsString()
+  @IsNotEmpty()
+  ARTIFACTS_PATH: string;
+
+  @IsString()
+  @IsNotEmpty()
   S3_PUBLIC_URL: string;
 
   @IsString()

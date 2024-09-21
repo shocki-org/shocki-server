@@ -38,7 +38,7 @@ module.exports = {
     ],
   },
   paths: {
-    sources: './src/modules/blockchain/contracts',
-    artifacts: './src/modules/blockchain/artifacts/artifacts',
+    sources: process.env.CONTRACTS_PATH,
+    artifacts: process.env.ARTIFACTS_PATH,
   },
 };
