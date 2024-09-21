@@ -59,14 +59,9 @@ export class ProductService {
       },
     });
 
-    // const productId = 'ad6c2551-6897-4181-a26e-edf67cb6f38d';
-    // const productId = '27bff359-16cd-4419-86dc-255f53c1f7a3';
-
     const address = await this.blockchainService.create(
       dto.name,
-      // productId,
-      product.id,
-      // `${this.configService.get('S3_PUBLIC_URL')}/${productId}/1.png`,
+      product.id.split('-')[0],
       `${this.configService.get('S3_PUBLIC_URL')}/${product.id}/1.png`,
     );
 
@@ -80,8 +75,6 @@ export class ProductService {
         tokenAddress: address,
       },
     });
-
-    // return { id: productId };
 
     return product;
   }
@@ -424,88 +417,88 @@ export class ProductService {
     if (!user.userAccount) throw new InternalServerErrorException('사용자 어카운트가 없습니다.');
     if (!user.userAccount.walletAddress) throw new BadRequestException('지갑 주소가 없습니다.');
 
-    if (product.currentAmount * amount > (user.userAccount.credit ?? 0))
-      throw new BadRequestException('잔액이 부족합니다.');
+    // if (product.currentAmount * amount > (user.userAccount.credit ?? 0))
+    //   throw new BadRequestException('잔액이 부족합니다.');
 
-    return this.prisma.$transaction(async (tx) => {
-      await tx.userAccount.update({
-        where: {
-          id: user.userAccount!.id,
-        },
-        data: {
-          credit: user.userAccount!.credit - product.currentAmount * amount,
-        },
-      });
+    // return this.prisma.$transaction(async (tx) => {
+    //   await tx.userAccount.update({
+    //     where: {
+    //       id: user.userAccount!.id,
+    //     },
+    //     data: {
+    //       credit: user.userAccount!.credit - product.currentAmount * amount,
+    //     },
+    //   });
 
-      const userTokenBalance = await tx.userTokenBalancesOnProduct
-        .findFirstOrThrow({
-          where: {
-            AND: [
-              {
-                productId,
-              },
-              {
-                userAccountId: user.userAccount!.id,
-              },
-            ],
-          },
-        })
-        .catch(() =>
-          tx.userTokenBalancesOnProduct.create({
-            data: {
-              product: {
-                connect: {
-                  id: productId,
-                },
-              },
-              userAccount: {
-                connect: {
-                  id: user.userAccount!.id,
-                },
-              },
-            },
-          }),
-        );
+    //   const userTokenBalance = await tx.userTokenBalancesOnProduct
+    //     .findFirstOrThrow({
+    //       where: {
+    //         AND: [
+    //           {
+    //             productId,
+    //           },
+    //           {
+    //             userAccountId: user.userAccount!.id,
+    //           },
+    //         ],
+    //       },
+    //     })
+    //     .catch(() =>
+    //       tx.userTokenBalancesOnProduct.create({
+    //         data: {
+    //           product: {
+    //             connect: {
+    //               id: productId,
+    //             },
+    //           },
+    //           userAccount: {
+    //             connect: {
+    //               id: user.userAccount!.id,
+    //             },
+    //           },
+    //         },
+    //       }),
+    //     );
 
-      await tx.userTokenBalancesOnProduct.update({
-        where: {
-          id: userTokenBalance.id,
-        },
-        data: {
-          token: {
-            increment: Number(amount),
-          },
-        },
-      });
+    //   await tx.userTokenBalancesOnProduct.update({
+    //     where: {
+    //       id: userTokenBalance.id,
+    //     },
+    //     data: {
+    //       token: {
+    //         increment: Number(amount),
+    //       },
+    //     },
+    //   });
 
-      await tx.product.update({
-        where: {
-          id: productId,
-        },
-        data: {
-          collectedAmount: {
-            increment: product.currentAmount * amount,
-          },
-          fundingLog: {
-            create: {
-              amount: Number(amount),
-              price: product.currentAmount,
-              userTokenBalance: {
-                connect: {
-                  id: userTokenBalance.id,
-                },
-              },
-            },
-          },
-        },
-      });
+    //   await tx.product.update({
+    //     where: {
+    //       id: productId,
+    //     },
+    //     data: {
+    //       collectedAmount: {
+    //         increment: product.currentAmount * amount,
+    //       },
+    //       fundingLog: {
+    //         create: {
+    //           amount: Number(amount),
+    //           price: product.currentAmount,
+    //           userTokenBalance: {
+    //             connect: {
+    //               id: userTokenBalance.id,
+    //             },
+    //           },
+    //         },
+    //       },
+    //     },
+    //   });
 
-      await this.blockchainService.transfer(
-        user.userAccount!.walletAddress!,
-        amount,
-        product.tokenAddress!,
-      );
-    });
+    await this.blockchainService.transfer(
+      user.userAccount!.walletAddress!,
+      amount,
+      product.tokenAddress!,
+    );
+    // });
   }
 
   // async sellProductToken(userId: string, productId: string, amount: number) {}

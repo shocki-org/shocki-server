@@ -324,7 +324,7 @@ export class UserService {
   async updateWalletAddress(id: string, walletAddress: string) {
     await this.prisma.userAccount.update({
       where: {
-        id,
+        userId: id,
       },
       data: {
         walletAddress,
@@ -335,7 +335,7 @@ export class UserService {
   async updateCredit(id: string, credit: number) {
     await this.prisma.userAccount.update({
       where: {
-        id,
+        userId: id,
       },
       data: {
         credit,
