@@ -50,6 +50,7 @@ export class UserService {
           walletAddress: true,
           userTokenBalancesOnProduct: {
             select: {
+              id: true,
               token: true,
               product: {
                 select: {
@@ -80,7 +81,7 @@ export class UserService {
               token: tokenBalance,
             },
             where: {
-              id: userAccount.id,
+              id: productToken.id,
             },
           });
         }
