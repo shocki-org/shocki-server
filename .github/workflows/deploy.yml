@@ -26,5 +26,6 @@ jobs:
             pnpm i
             DATABASE_URL=${{ secrets.DATABASE_URL }} pnpx prisma migrate dev -n init
             docker system prune -af
+            docker compose build
             docker compose down
-            docker compose up -d --build --force-recreate
+            docker compose up -d --force-recreate
