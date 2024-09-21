@@ -5,8 +5,8 @@ import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@
 import { AddressService } from './address.service';
 import { AddressResponseDTO } from './dto/address-response.dto';
 
-@ApiTags('address')
-@Controller('Address')
+@Controller('address')
+@ApiTags('Address')
 export class AddressController {
   constructor(private readonly addressService: AddressService) {}
 
