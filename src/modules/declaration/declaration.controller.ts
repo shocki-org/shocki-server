@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBadRequestResponse,
@@ -31,5 +31,15 @@ export class DeclarationController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async report(@CurrentUser() { id }: JwtPayload, @Body() dto: ReportDTO) {
     return this.declarationService.report(id, dto);
+  }
+
+  @Get('declarations')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('access'))
+  @ApiOperation({ summary: '신고 내역 가져오기' })
+  @ApiOkResponse({ description: 'Declaration list' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  async getDeclarations(@Query('productId') id: string) {
+    return this.declarationService.getDeclarations(id);
   }
 }
