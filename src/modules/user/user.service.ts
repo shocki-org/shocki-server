@@ -10,12 +10,16 @@ import {
 
 import { PrismaService } from 'src/common/modules/prisma/prisma.service';
 
+import { BlockchainService } from '../blockchain/blockchain.service';
 import { PayDTO } from './dto/pay.user.dto';
 import { SettlementProductDTO } from './dto/settlement.user.dto';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly blockchain: BlockchainService,
+  ) {}
 
   async getUser(userId: string) {
     const user = await this.prisma.user.findUnique({
@@ -38,7 +42,53 @@ export class UserService {
     return user;
   }
 
+  async updateTokenBalancees(userId: string) {
+    return this.prisma.userAccount
+      .findFirst({
+        select: {
+          id: true,
+          walletAddress: true,
+          userTokenBalancesOnProduct: {
+            select: {
+              token: true,
+              product: {
+                select: {
+                  id: true,
+                  tokenAddress: true,
+                },
+              },
+            },
+          },
+        },
+        where: {
+          userId,
+        },
+      })
+      .then(async (userAccount) => {
+        if (!userAccount) throw new NotFoundException('사용자 어카운트를 찾을 수 없습니다.');
+
+        for (const productToken of userAccount.userTokenBalancesOnProduct) {
+          if (!productToken.product.tokenAddress) continue;
+
+          const tokenBalance = await this.blockchain.getBalance(
+            productToken.product.tokenAddress,
+            userAccount.walletAddress!,
+          );
+
+          await this.prisma.userTokenBalancesOnProduct.update({
+            data: {
+              token: tokenBalance,
+            },
+            where: {
+              id: userAccount.id,
+            },
+          });
+        }
+      });
+  }
+
   async balance(userId: string) {
+    this.updateTokenBalancees(userId);
     const user = await this.prisma.user.findUnique({
       select: {
         id: true,
