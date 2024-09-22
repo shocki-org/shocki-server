@@ -114,6 +114,15 @@ export class ProductService {
         },
         data: {
           type: ProductType.SELLING,
+          marketEndDate: DateTime.now()
+            .set({
+              hour: 0,
+              minute: 0,
+              second: 0,
+              millisecond: 0,
+            })
+            .plus({ years: 1 })
+            .toJSDate(),
         },
       });
     else throw new BadRequestException('펀딩 기간이 종료되지 않았습니다.');
@@ -244,6 +253,14 @@ export class ProductService {
             x: log.amount,
             y,
           })),
+        };
+      })
+      .then((product) => {
+        return {
+          ...product,
+          purchaseIsDisabled:
+            product.fundingEndDate < DateTime.now().toJSDate() &&
+            product.type === ProductType.FUNDING,
         };
       })
       .then((product) => {
@@ -464,6 +481,10 @@ export class ProductService {
 
     if (!product) throw new NotFoundException('상품을 찾을 수 없습니다.');
     if (!product.tokenAddress) throw new InternalServerErrorException('토큰 주소가 없습니다.');
+    if (product.type !== ProductType.FUNDING)
+      throw new BadRequestException('펀딩 상품이 아닙니다.');
+    if (product.fundingEndDate < DateTime.now().toJSDate())
+      throw new BadRequestException('펀딩 기간이 종료되었습니다.');
 
     const user = await this.prisma.user.findUnique({
       select: {

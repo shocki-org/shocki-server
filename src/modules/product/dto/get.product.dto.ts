@@ -24,6 +24,12 @@ export class GetProductDTO extends ProductDTO {
     type: [String],
   })
   detailImages: string[];
+
+  @ApiProperty({
+    description: '구매 가능 여부',
+    type: Boolean,
+  })
+  purchaseIsDisabled: boolean;
 }
 
 export class GetProductsDTO extends PickType(ProductDTO, ['id', 'name', 'image', 'currentAmount']) {
