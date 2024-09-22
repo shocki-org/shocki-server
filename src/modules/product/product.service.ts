@@ -605,6 +605,11 @@ export class ProductService {
           },
         },
       });
+
+      return {
+        token: beforeTokenBalance.token - newTokenBalance,
+        credit: (beforeTokenBalance.token - newTokenBalance) * product.currentAmount,
+      };
     });
   }
 

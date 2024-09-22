@@ -22,6 +22,7 @@ import { CreateProductQnADTO } from './dto/create.qna.dto';
 import { GetProductDTO, GetProductsDTO } from './dto/get.product.dto';
 import { UploadProductDetailImageDTO } from './dto/image.product.dto';
 import { PurchaseMarketProductDTO } from './dto/purchase.market.dto';
+import { SaleProductTokenResponse } from './dto/sale.token.dto';
 import { SearchProductDTO } from './dto/search.product.dto';
 import { UploadImageDTO } from './dto/upload.image.dto';
 import { ProductService } from './product.service';
@@ -237,14 +238,12 @@ export class ProductController {
   @UseGuards(AuthGuard('access'))
   @ApiQuery({ name: 'productId', required: true, type: String })
   @ApiOperation({ summary: '토큰 판매하기' })
-  @ApiOkResponse({ description: 'Success' })
+  @ApiOkResponse({ description: 'Success', type: SaleProductTokenResponse })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBadRequestResponse({ description: '판매할 토큰이 없습니다.' })
   @ApiNotFoundResponse({ description: 'Product or User not found' })
   async saleProductToken(@CurrentUser() { id }: JwtPayload, @Query('productId') productId: string) {
-    await this.productService.saleProductToken(id, productId);
-
-    return { success: true };
+    return await this.productService.saleProductToken(id, productId);
   }
 
   @Post('purchase/market')
