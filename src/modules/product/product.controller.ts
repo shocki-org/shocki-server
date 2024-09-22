@@ -1,6 +1,6 @@
 import { ProductType } from '@prisma/client';
 
-import { Body, Controller, Get, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBadRequestResponse,
@@ -55,6 +55,23 @@ export class ProductController {
     const res = await this.productService.createProduct(id, dto);
 
     return { productId: res.id };
+  }
+
+  @Patch('type')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('access'))
+  @ApiOperation({ summary: '상품 타입 변경 (펀딩 -> 마켓, 펀딩 기간 종료 이후 수동 전환)' })
+  @ApiOkResponse({ description: 'Success' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiNotFoundResponse({ description: 'Product not found' })
+  @ApiBadRequestResponse({ description: '이미 마켓 상품이거나, 펀딩 기간이 종료되지 않았습니다.' })
+  async updateProductType(
+    @CurrentUser() { id }: JwtPayload,
+    @Query('productId') productId: string,
+  ) {
+    await this.productService.updateProductType(id, productId);
+
+    return { success: true };
   }
 
   @Put('image')

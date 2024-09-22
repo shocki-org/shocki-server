@@ -92,6 +92,32 @@ export class ProductService {
     return product;
   }
 
+  async updateProductType(userId: string, productId: string) {
+    const product = await this.prisma.product.findUnique({
+      where: {
+        id: productId,
+      },
+    });
+
+    if (!product) throw new NotFoundException('상품을 찾을 수 없습니다.');
+    if (product.ownerId !== userId) throw new BadRequestException('상품 소유자가 아닙니다.');
+    if (product.type === ProductType.SELLING)
+      throw new BadRequestException('이미 마켓 상품입니다.');
+
+    const fundingEndDate = DateTime.fromJSDate(product.fundingEndDate);
+
+    if (fundingEndDate.diffNow('days').days < 0)
+      return this.prisma.product.update({
+        where: {
+          id: productId,
+        },
+        data: {
+          type: ProductType.SELLING,
+        },
+      });
+    else throw new BadRequestException('펀딩 기간이 종료되지 않았습니다.');
+  }
+
   async uploadProductImage(userId: string, productId: string, base64Image: string) {
     const product = await this.prisma.product.findUnique({
       where: {
