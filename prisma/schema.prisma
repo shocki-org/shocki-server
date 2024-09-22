@@ -104,6 +104,7 @@ model Product {
   collectedAmount            Int                          @default(0)
   distributionPercent        Float
   fundingEndDate             DateTime
+  marketEndDate              DateTime
   tokenAddress               String?
   productQnA                 ProductQnA[]
   fundingLog                 FundingLog[]
