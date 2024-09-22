@@ -99,6 +99,7 @@ model Product {
   name                       String
   image                      String?
   type                       ProductType                  @default(FUNDING)
+  startAmount                Int
   currentAmount              Int
   targetAmount               Int
   collectedAmount            Int                          @default(0)

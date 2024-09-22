@@ -18,6 +18,9 @@ export class ProductDTO implements Product {
   @ApiProperty({ enum: $Enums.ProductType })
   type: $Enums.ProductType;
 
+  @ApiProperty({ description: '시작가' })
+  startAmount: number;
+
   @ApiProperty({ description: '현재가' })
   currentAmount: number;
 

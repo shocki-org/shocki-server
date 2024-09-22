@@ -34,6 +34,7 @@ export class ProductService {
       data: {
         name: dto.name,
         image: `${this.configService.get('S3_PUBLIC_URL')}/cover.png`,
+        startAmount: dto.currentAmount,
         currentAmount: dto.currentAmount,
         targetAmount: dto.targetAmount,
         distributionPercent: Number(dto.distributionPercent),
