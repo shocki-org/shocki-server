@@ -125,6 +125,11 @@ model ProductDetailImage {
   index     Int
 }
 
+enum FundingType {
+  DEPOSIT
+  WITHDRAW
+}
+
 model FundingLog {
   id                 Int                         @id @default(autoincrement())
   productId          String
@@ -133,6 +138,7 @@ model FundingLog {
   userTokenBalance   UserTokenBalancesOnProduct? @relation(fields: [userTokenBalanceId], references: [id], onDelete: SetNull)
   amount             Int
   price              Int
+  type               FundingType
   createdAt          DateTime                    @default(now())
 }
 

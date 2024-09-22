@@ -1,4 +1,4 @@
-import { ProductQnAAuthorType, ProductType } from '@prisma/client';
+import { FundingType, ProductQnAAuthorType, ProductType } from '@prisma/client';
 import { DateTime } from 'luxon';
 
 import {
@@ -572,6 +572,7 @@ export class ProductService {
             create: {
               amount: Number(amount),
               price: product.currentAmount,
+              type: FundingType.DEPOSIT,
               userTokenBalance: {
                 connect: {
                   id: userTokenBalance.id,
