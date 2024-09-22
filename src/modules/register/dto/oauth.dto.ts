@@ -1,10 +1,10 @@
 import { Provider } from '@prisma/client';
-import { IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
 
 export class OAuthDTO {
-  @IsString()
+  @IsEnum(Object.values(Provider))
   @IsNotEmpty()
   @ApiProperty({
     description: 'OAuth Provider',
