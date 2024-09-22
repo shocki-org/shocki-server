@@ -20,6 +20,7 @@ import { CurrentUser } from 'src/common';
 import { CreateProductDTO } from './dto/create.product.dto';
 import { CreateProductQnADTO } from './dto/create.qna.dto';
 import { GetProductDTO, GetProductsDTO } from './dto/get.product.dto';
+import { UploadProductDetailImageDTO } from './dto/image.product.dto';
 import { PurchaseMarketProductDTO } from './dto/purchase.market.dto';
 import { SearchProductDTO } from './dto/search.product.dto';
 import { UploadImageDTO } from './dto/upload.image.dto';
@@ -92,6 +93,27 @@ export class ProductController {
     @Body('image') image: string,
   ) {
     await this.productService.uploadProductImage(id, productId, image);
+
+    return { success: true };
+  }
+
+  @Put('image/detail')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('access'))
+  @ApiBody({
+    type: UploadProductDetailImageDTO,
+    description: 'Upload product detail image',
+  })
+  @ApiOperation({ summary: '상품 상세 이미지 업로드' })
+  @ApiOkResponse({ description: 'Success' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiNotFoundResponse({ description: 'Product not found' })
+  @ApiBadRequestResponse({ description: '상품 소유자가 아님' })
+  async uploadProductDetailImage(
+    @CurrentUser() { id }: JwtPayload,
+    @Body() dto: UploadProductDetailImageDTO,
+  ) {
+    await this.productService.uploadProductDetailImage(id, dto);
 
     return { success: true };
   }

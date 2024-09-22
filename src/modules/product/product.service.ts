@@ -16,6 +16,7 @@ import { BlockchainService } from '../blockchain/blockchain.service';
 import { CreateProductDTO } from './dto/create.product.dto';
 import { CreateProductQnADTO } from './dto/create.qna.dto';
 import { GetProductDTO, GetProductsDTO } from './dto/get.product.dto';
+import { UploadProductDetailImageDTO } from './dto/image.product.dto';
 
 @Injectable()
 export class ProductService {
@@ -139,6 +140,33 @@ export class ProductService {
       },
       data: {
         image: url,
+      },
+    });
+  }
+
+  async uploadProductDetailImage(userId: string, dto: UploadProductDetailImageDTO) {
+    const product = await this.prisma.product.findUnique({
+      where: {
+        id: dto.productId,
+      },
+    });
+
+    if (!product) throw new NotFoundException('상품을 찾을 수 없습니다.');
+    if (product.ownerId !== userId) throw new BadRequestException('상품 소유자가 아닙니다.');
+
+    const key = `${product.id}/detail/${dto.index}.png`;
+
+    const url = await this.s3Service.uploadImage(key, dto.base64Image);
+
+    return this.prisma.productDetailImage.create({
+      data: {
+        image: url,
+        index: dto.index,
+        product: {
+          connect: {
+            id: dto.productId,
+          },
+        },
       },
     });
   }
