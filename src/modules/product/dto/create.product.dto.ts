@@ -49,7 +49,7 @@ export class CreateProductDTO implements Partial<Prisma.ProductCreateInput> {
   @IsNotEmpty()
   @ApiProperty({
     example: '2024-09-15T00:00:00.000Z',
-    description: '펀딩 종료일 (ISO 8601)',
+    description: '마켓 종료일 (ISO 8601)',
   })
   marketEndDate: string;
 
