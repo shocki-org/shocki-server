@@ -198,7 +198,7 @@ export class ProductService {
           },
           fundingLog: {
             select: {
-              amount: true,
+              price: true,
               createdAt: true,
             },
           },
@@ -250,9 +250,9 @@ export class ProductService {
       .then((product) => {
         return {
           ...product,
-          graph: product.fundingLog.map((log, y) => ({
-            x: log.amount,
-            y,
+          graph: product.fundingLog.map((log, x) => ({
+            x,
+            y: log.price,
           })),
         };
       })
