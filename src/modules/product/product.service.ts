@@ -473,6 +473,119 @@ export class ProductService {
     });
   }
 
+  async saleProductToken(userId: string, productId: string) {
+    const product = await this.prisma.product.findUnique({
+      select: {
+        tokenAddress: true,
+        currentAmount: true,
+        fundingEndDate: true,
+        type: true,
+      },
+      where: {
+        id: productId,
+      },
+    });
+
+    if (!product) throw new NotFoundException('상품을 찾을 수 없습니다.');
+    if (!product.tokenAddress) throw new InternalServerErrorException('토큰 주소가 없습니다.');
+    if (product.type !== ProductType.FUNDING)
+      throw new BadRequestException('펀딩 상품이 아닙니다.');
+    if (product.fundingEndDate < DateTime.now().toJSDate())
+      throw new BadRequestException('펀딩 기간이 종료되었습니다.');
+
+    const user = await this.prisma.user.findUnique({
+      select: {
+        userAccount: {
+          select: {
+            id: true,
+            walletAddress: true,
+            userTokenBalancesOnProduct: {
+              select: {
+                id: true,
+                token: true,
+              },
+              where: {
+                product: {
+                  id: productId,
+                },
+                userAccount: {
+                  user: {
+                    id: userId,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
+    if (!user.userAccount) throw new InternalServerErrorException('사용자 어카운트가 없습니다.');
+    if (!user.userAccount.walletAddress) throw new BadRequestException('지갑 주소가 없습니다.');
+    if (!user.userAccount.userTokenBalancesOnProduct.length)
+      throw new BadRequestException('상품 토큰이 없습니다.');
+
+    const beforeTokenBalance = user.userAccount.userTokenBalancesOnProduct[0];
+    const newTokenBalance = await this.blockchain.getBalance(
+      product.tokenAddress,
+      user.userAccount.walletAddress,
+    );
+
+    if (beforeTokenBalance.token <= newTokenBalance)
+      throw new BadRequestException('토큰이 충분하지 않습니다.');
+
+    return this.prisma.$transaction(async (tx) => {
+      await tx.userTokenBalancesOnProduct.update({
+        where: {
+          id: beforeTokenBalance.id,
+        },
+        data: {
+          token: {
+            decrement: beforeTokenBalance.token - newTokenBalance,
+          },
+        },
+      });
+
+      await tx.userAccount.update({
+        where: {
+          id: user.userAccount!.id,
+        },
+        data: {
+          credit: {
+            increment: (beforeTokenBalance.token - newTokenBalance) * product.currentAmount,
+          },
+        },
+      });
+
+      await tx.product.update({
+        where: {
+          id: productId,
+        },
+        data: {
+          collectedAmount: {
+            decrement: (beforeTokenBalance.token - newTokenBalance) * product.currentAmount,
+          },
+          fundingLog: {
+            create: {
+              amount: beforeTokenBalance.token - newTokenBalance,
+              price: product.currentAmount,
+              type: FundingType.WITHDRAW,
+              userTokenBalance: {
+                connect: {
+                  id: beforeTokenBalance.id,
+                },
+              },
+            },
+          },
+        },
+      });
+    });
+  }
+
   async purchaseProductToken(userId: string, productId: string, amount: number) {
     const product = await this.prisma.product.findUnique({
       where: {
