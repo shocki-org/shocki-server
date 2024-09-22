@@ -55,7 +55,7 @@ export class UserController {
   @UseGuards(AuthGuard('access'))
   @ApiBearerAuth()
   @ApiOperation({ summary: '유저 배송정보 가져오기' })
-  @ApiOkResponse({ description: 'Success', type: GetDeliveryStatusDTO })
+  @ApiOkResponse({ description: 'Success', type: [GetDeliveryStatusDTO] })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async getDeliveryStatus(@CurrentUser() { id }: JwtPayload) {
     return this.userService.deliveryStatus(id);
