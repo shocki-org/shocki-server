@@ -515,7 +515,9 @@ export class ProductService {
           id: user.userAccount!.id,
         },
         data: {
-          credit: user.userAccount!.credit - product.currentAmount * amount,
+          credit: {
+            decrement: product.currentAmount * amount,
+          },
         },
       });
 
