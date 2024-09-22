@@ -34,6 +34,7 @@ export class ProductController {
   @Get()
   @ApiBearerAuth()
   @UseGuards(AuthGuard('access'))
+  @ApiQuery({ name: 'id', required: true, type: String, description: 'Product ID' })
   @ApiOperation({ summary: '상품 가져오기' })
   @ApiOkResponse({ description: 'Product', type: GetProductDTO })
   @ApiNotFoundResponse({ description: 'Product not found' })
@@ -61,6 +62,7 @@ export class ProductController {
   @Patch('type')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('access'))
+  @ApiQuery({ name: 'productId', required: true, type: String, description: 'Product ID' })
   @ApiOperation({ summary: '상품 타입 변경 (펀딩 -> 마켓, 펀딩 기간 종료 이후 수동 전환)' })
   @ApiOkResponse({ description: 'Success' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
@@ -82,6 +84,7 @@ export class ProductController {
     type: UploadImageDTO,
     description: 'Upload product image',
   })
+  @ApiQuery({ name: 'productId', required: true, type: String, description: 'Product ID' })
   @ApiOperation({ summary: '상품 이미지 업로드' })
   @ApiOkResponse({ description: 'Success' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
@@ -90,9 +93,9 @@ export class ProductController {
   async uploadProductImage(
     @CurrentUser() { id }: JwtPayload,
     @Query('productId') productId: string,
-    @Body('image') image: string,
+    @Body() dto: UploadImageDTO,
   ) {
-    await this.productService.uploadProductImage(id, productId, image);
+    await this.productService.uploadProductImage(id, productId, dto.image);
 
     return { success: true };
   }
@@ -147,6 +150,7 @@ export class ProductController {
 
   @Get('search')
   @ApiBearerAuth()
+  @ApiQuery({ name: 'keyword', required: true, type: String })
   @UseGuards(AuthGuard('access'))
   @ApiOperation({ summary: '상품 검색하기' })
   @ApiOkResponse({ description: 'Product list (없으면 빈 배열)', type: [SearchProductDTO] })
@@ -158,6 +162,7 @@ export class ProductController {
   @Put('favorite')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('access'))
+  @ApiQuery({ name: 'productId', required: true, type: String })
   @ApiOperation({ summary: '좋아요 누르기' })
   @ApiOkResponse({ description: 'Success' })
   @ApiNotFoundResponse({ description: 'Product not found' })
@@ -172,6 +177,7 @@ export class ProductController {
   @Put('unfavorite')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('access'))
+  @ApiQuery({ name: 'productId', required: true, type: String })
   @ApiOperation({ summary: '좋아요 취소하기' })
   @ApiOkResponse({ description: 'Success' })
   @ApiNotFoundResponse({ description: 'Product not found' })
@@ -209,6 +215,8 @@ export class ProductController {
   @Post('purchase/token')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('access'))
+  @ApiQuery({ name: 'productId', required: true, type: String })
+  @ApiQuery({ name: 'amount', required: true, type: Number, description: '구매할 토큰 수량' })
   @ApiOperation({ summary: '펀딩 상품 구매하기' })
   @ApiOkResponse({ description: 'Success' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })

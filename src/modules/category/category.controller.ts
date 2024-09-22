@@ -4,6 +4,7 @@ import {
   ApiBearerAuth,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -30,6 +31,7 @@ export class CategoryController {
   @Get('products')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('access'))
+  @ApiQuery({ name: 'categoryId', required: true, type: String })
   @ApiOperation({ summary: '카테고리 ID로 상품 리스트 가져오기' })
   @ApiOkResponse({ description: 'Product list', type: [GetProductsByCategoryDTO] })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })

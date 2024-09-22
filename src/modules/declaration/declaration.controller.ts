@@ -6,6 +6,7 @@ import {
   ApiBody,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -36,6 +37,7 @@ export class DeclarationController {
   @Get('declarations')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('access'))
+  @ApiQuery({ name: 'productId', required: true, type: String })
   @ApiOperation({ summary: '신고 내역 가져오기' })
   @ApiOkResponse({ description: 'Declaration list' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
