@@ -225,6 +225,18 @@ export class ProductService {
               index: true,
             },
           },
+          userTokenBalancesOnProduct: {
+            select: {
+              token: true,
+            },
+            where: {
+              userAccount: {
+                user: {
+                  id: userId,
+                },
+              },
+            },
+          },
         },
       })
       .then((product) => {
@@ -265,8 +277,18 @@ export class ProductService {
         };
       })
       .then((product) => {
+        if (!product.userTokenBalancesOnProduct.length) return product;
+        return {
+          ...product,
+          saleIsDisabled:
+            product.userTokenBalancesOnProduct[0].token === 0 &&
+            product.type === ProductType.FUNDING,
+        };
+      })
+      .then((product) => {
         const copy: { [key: string]: any } = { ...product };
         delete copy['fundingLog'];
+        delete copy['userTokenBalancesOnProduct'];
 
         return copy as unknown as GetProductDTO;
       })
