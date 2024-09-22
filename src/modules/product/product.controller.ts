@@ -232,6 +232,21 @@ export class ProductController {
     return { success: true };
   }
 
+  @Post('sale/token')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('access'))
+  @ApiQuery({ name: 'productId', required: true, type: String })
+  @ApiOperation({ summary: '토큰 판매하기' })
+  @ApiOkResponse({ description: 'Success' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiBadRequestResponse({ description: '판매할 토큰이 없습니다.' })
+  @ApiNotFoundResponse({ description: 'Product or User not found' })
+  async saleProductToken(@CurrentUser() { id }: JwtPayload, @Query('productId') productId: string) {
+    await this.productService.saleProductToken(id, productId);
+
+    return { success: true };
+  }
+
   @Post('purchase/market')
   @ApiBody({
     type: PurchaseMarketProductDTO,
