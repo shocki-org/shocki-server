@@ -60,6 +60,18 @@ export class ProductService {
       },
     });
 
+    await this.prisma.productDetailImage.create({
+      data: {
+        image: `${this.configService.get('S3_PUBLIC_URL')}/cover.png`,
+        index: 0,
+        product: {
+          connect: {
+            id: product.id,
+          },
+        },
+      },
+    });
+
     const address = await this.blockchain.create(
       dto.name,
       product.id.split('-')[0],
