@@ -489,6 +489,9 @@ export class ProductService {
           id: productId,
         },
         data: {
+          targetAmount: {
+            increment: product.currentAmount * amount,
+          },
           collectedAmount: {
             increment: product.currentAmount * amount,
           },
