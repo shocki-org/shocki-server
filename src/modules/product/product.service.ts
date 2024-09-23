@@ -556,6 +556,7 @@ export class ProductService {
       product.tokenAddress,
       user.userAccount.walletAddress,
     );
+    const returnedToken = beforeTokenBalance.token - newTokenBalance;
 
     if (beforeTokenBalance.token <= newTokenBalance)
       throw new BadRequestException('토큰이 충분하지 않습니다.');
@@ -567,7 +568,7 @@ export class ProductService {
         },
         data: {
           token: {
-            decrement: beforeTokenBalance.token - newTokenBalance,
+            decrement: returnedToken,
           },
         },
       });
@@ -578,7 +579,7 @@ export class ProductService {
         },
         data: {
           credit: {
-            increment: (beforeTokenBalance.token - newTokenBalance) * product.currentAmount,
+            increment: returnedToken * product.currentAmount,
           },
         },
       });
@@ -589,11 +590,11 @@ export class ProductService {
         },
         data: {
           collectedAmount: {
-            decrement: (beforeTokenBalance.token - newTokenBalance) * product.currentAmount,
+            decrement: returnedToken * product.currentAmount,
           },
           fundingLog: {
             create: {
-              amount: beforeTokenBalance.token - newTokenBalance,
+              amount: returnedToken,
               price: product.currentAmount,
               type: FundingType.WITHDRAW,
               userTokenBalance: {
@@ -607,8 +608,8 @@ export class ProductService {
       });
 
       return {
-        token: beforeTokenBalance.token - newTokenBalance,
-        credit: (beforeTokenBalance.token - newTokenBalance) * product.currentAmount,
+        token: returnedToken,
+        credit: returnedToken * product.currentAmount,
       };
     });
   }
