@@ -30,7 +30,7 @@ export class BlockchainService {
     const ShockiNFT = await ethers.getContractFactory('ShockiNFT');
     const erc721 = await ShockiNFT.deploy(name, symbol);
 
-    await erc721.setBaseURI(imageBaseURI);
+    // await erc721.setBaseURI(imageBaseURI);
 
     const address = await erc721.getAddress();
 
