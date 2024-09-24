@@ -29,6 +29,7 @@ export class BlockchainService {
   private async _createERC721(name: string, symbol: string, imageBaseURI: string): Promise<string> {
     const ShockiNFT = await ethers.getContractFactory('ShockiNFT');
     const erc721 = await ShockiNFT.deploy(name, symbol, {
+      nonce: await this.getTransactionCount(),
       gasLimit: 3000000,
       gasPrice: ethers.parseUnits('1', 'gwei'),
     });
@@ -45,6 +46,7 @@ export class BlockchainService {
   private async _createERC20(name: string, symbol: string, nftAddress: string): Promise<string> {
     const ShockiToken = await ethers.getContractFactory('ShockiToken');
     const erc20 = await ShockiToken.deploy(name, symbol, nftAddress, {
+      nonce: await this.getTransactionCount(),
       gasLimit: 3000000,
       gasPrice: ethers.parseUnits('1', 'gwei'),
     });
