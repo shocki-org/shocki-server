@@ -352,13 +352,25 @@ export class UserService {
       const response = await fetch(url, options);
       const data = await response.json();
       const { totalAmount } = data as { totalAmount: number };
-      if (!response.ok)
-        throw new InternalServerErrorException(data.message || 'Payment confirmation failed');
+
+      const user = await this.prisma.user.findUnique({
+        select: {
+          userAccount: {
+            select: {
+              id: true,
+            },
+          },
+        },
+        where: {
+          id: userId,
+        },
+      });
+      if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
 
       await this.prisma.userAccount
         .update({
           where: {
-            id: userId,
+            id: user?.userAccount?.id,
           },
           data: {
             credit: {
