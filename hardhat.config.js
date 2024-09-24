@@ -20,7 +20,6 @@ module.exports = {
     minato: {
       url: process.env.RPC_URL,
       accounts: ['0x' + process.env.DEPLOYER_PRIVATE_KEY],
-      gasPrice: 35_000_000_000,
     },
   },
   etherscan: {
