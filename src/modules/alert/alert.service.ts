@@ -29,28 +29,33 @@ export class AlertService {
   }
 
   async createAlert(alert: AlertDTO, userId: string) {
-    return this.prisma.alert
-      .create({
-        data: {
-          ...alert,
-          user: {
-            connect: {
-              id: userId,
-            },
+    const createdAlert = await this.prisma.alert.create({
+      data: {
+        ...alert,
+        user: {
+          connect: {
+            id: userId,
           },
         },
-      })
-      .then(() => this.prisma.user.findUnique({ where: { id: userId } }))
-      .then((user) => user?.fcmToken || '')
-      .then((fcmToken) =>
-        this.firebase.sendNotificationByToken({
-          token: fcmToken,
-          title: alert.title,
-          body: alert.content,
-        }),
-      )
-      .catch(() => {
-        throw new InternalServerErrorException('알림 생성에 실패했거나, 전송에 실패했습니다.');
-      });
+      },
+    });
+
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        fcmToken: true,
+      },
+    });
+
+    if (!user) throw new InternalServerErrorException('User not found');
+    if (!user.fcmToken) return;
+
+    this.firebase.sendNotificationByToken({
+      token: user.fcmToken,
+      title: createdAlert.title,
+      body: createdAlert.content,
+    });
   }
 }
