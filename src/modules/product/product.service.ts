@@ -83,7 +83,7 @@ export class ProductService {
       },
     );
 
-    this.blockchain
+    await this.blockchain
       .create(
         dto.name,
         // product.id.split('-')[0],
