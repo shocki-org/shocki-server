@@ -39,7 +39,7 @@ export class ProductService {
         targetAmount: dto.targetAmount,
         distributionPercent: Number(dto.distributionPercent),
         fundingEndDate: DateTime.fromISO(dto.fundingEndDate).toJSDate(),
-        marketEndDate: DateTime.fromISO(dto.marketEndDate).toJSDate(),
+        marketEndDate: DateTime.now().toJSDate(),
         user: {
           connect: {
             id: userId,
