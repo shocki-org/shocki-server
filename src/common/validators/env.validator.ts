@@ -92,6 +92,10 @@ class EnvironmentVariables {
 
   @IsString()
   @IsNotEmpty()
+  KAKAO_API_ADMIN_KEY: string;
+
+  @IsString()
+  @IsNotEmpty()
   TEST_KEY: string;
 }
 

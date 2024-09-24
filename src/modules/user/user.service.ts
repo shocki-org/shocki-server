@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, Provider } from '@prisma/client';
 import { DateTime } from 'luxon';
 
 import {
@@ -7,6 +7,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 import { PrismaService } from 'src/common/modules/prisma/prisma.service';
 
@@ -19,6 +20,12 @@ export class UserService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly blockchain: BlockchainService,
+    private readonly configService: ConfigService<
+      {
+        KAKAO_API_ADMIN_KEY: string;
+      },
+      true
+    >,
   ) {}
 
   async getUser(userId: string) {
@@ -402,6 +409,25 @@ export class UserService {
     });
 
     if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
+    if (user.provider === Provider.KAKAO) {
+      const KAKAOAK = this.configService.get('KAKAO_API_ADMIN_KEY', { infer: true });
+
+      const data = new URLSearchParams();
+
+      data.append('target_id_type', 'user_id');
+      data.append('target_id', user.providerId);
+
+      await fetch('https://kapi.kakao.com/v1/user/unlink', {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Authorization: `KakaoAK ${KAKAOAK}`,
+        },
+        method: 'POST',
+        body: data,
+      })
+        .then((res) => res.text())
+        .then(console.log);
+    }
 
     const res = await this.prisma.user
       .delete({
