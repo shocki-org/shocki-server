@@ -56,7 +56,10 @@ export class BlockchainService {
     return address;
   }
 
-  // SHO1, SHO2, SHO3, SHO4, SHO5, SHO6, SHO7, SHO8, SHO9, SHO10
+  async getTransactionCount(): Promise<number> {
+    return await this.provider.getTransactionCount(this.deployer.address);
+  }
+
   async create(name: string, symbol: string, imageBaseURI: string): Promise<string> {
     const nftAddress = await this._createERC721(name, symbol, imageBaseURI);
 

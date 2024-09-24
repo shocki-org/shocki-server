@@ -86,7 +86,8 @@ export class ProductService {
     this.blockchain
       .create(
         dto.name,
-        product.id.split('-')[0],
+        // product.id.split('-')[0],
+        `SHO${await this.blockchain.getTransactionCount()}`,
         `${this.configService.get('S3_PUBLIC_URL')}/${product.id}/1.png`,
       )
       .then((address) => {
