@@ -28,9 +28,14 @@ export class BlockchainService {
   // eg. imageURI: 'https://ipfs.io/ipfs/QmZzv1Q2' and 1.png
   private async _createERC721(name: string, symbol: string, imageBaseURI: string): Promise<string> {
     const ShockiNFT = await ethers.getContractFactory('ShockiNFT');
-    const erc721 = await ShockiNFT.deploy(name, symbol);
+    const erc721 = await ShockiNFT.deploy(name, symbol, {
+      gasLimit: 3000000,
+      gasPrice: ethers.parseUnits('1', 'gwei'),
+    });
 
     // await erc721.setBaseURI(imageBaseURI);
+
+    await erc721.waitForDeployment();
 
     const address = await erc721.getAddress();
 
@@ -39,7 +44,12 @@ export class BlockchainService {
 
   private async _createERC20(name: string, symbol: string, nftAddress: string): Promise<string> {
     const ShockiToken = await ethers.getContractFactory('ShockiToken');
-    const erc20 = await ShockiToken.deploy(name, symbol, nftAddress);
+    const erc20 = await ShockiToken.deploy(name, symbol, nftAddress, {
+      gasLimit: 3000000,
+      gasPrice: ethers.parseUnits('1', 'gwei'),
+    });
+
+    await erc20.waitForDeployment();
 
     const address = await erc20.getAddress();
 
