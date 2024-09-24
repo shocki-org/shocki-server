@@ -461,7 +461,7 @@ export class ProductService {
     if (product.type !== ProductType.SELLING)
       throw new BadRequestException('마켓 상품이 아닙니다.');
 
-    if (product.currentAmount * dto.amount > (user.userAccount.credit ?? 0))
+    if (product.currentAmount * dto.amount > user.userAccount.credit)
       throw new BadRequestException('잔액이 부족합니다.');
 
     return this.prisma.$transaction(async (tx) => {
