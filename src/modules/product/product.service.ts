@@ -30,7 +30,7 @@ export class ProductService {
   ) {}
 
   async createProduct(userId: string, dto: CreateProductDTO) {
-    return this.prisma.$transaction(
+    const product = await this.prisma.$transaction(
       async (tx) => {
         const product = await tx.product.create({
           data: {
@@ -76,34 +76,37 @@ export class ProductService {
           },
         });
 
-        const address = await this.blockchain
-          .create(
-            dto.name,
-            product.id.split('-')[0],
-            `${this.configService.get('S3_PUBLIC_URL')}/${product.id}/1.png`,
-          )
-          .then((address) => {
-            console.log(address);
-            if (!address) throw new InternalServerErrorException('NFT 생성에 실패했습니다.');
-
-            return address;
-          });
-
-        await tx.product.update({
-          where: {
-            id: product.id,
-          },
-          data: {
-            tokenAddress: address,
-          },
-        });
-
         return product;
       },
       {
         timeout: 10000,
       },
     );
+
+    this.blockchain
+      .create(
+        dto.name,
+        product.id.split('-')[0],
+        `${this.configService.get('S3_PUBLIC_URL')}/${product.id}/1.png`,
+      )
+      .then((address) => {
+        console.log(address);
+        if (!address) throw new InternalServerErrorException('NFT 생성에 실패했습니다.');
+
+        return address;
+      })
+      .then((address) =>
+        this.prisma.product.update({
+          where: {
+            id: product.id,
+          },
+          data: {
+            tokenAddress: address,
+          },
+        }),
+      );
+
+    return product;
   }
 
   async updateProductType(userId: string, productId: string) {
