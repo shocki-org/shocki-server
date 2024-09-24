@@ -30,70 +30,80 @@ export class ProductService {
   ) {}
 
   async createProduct(userId: string, dto: CreateProductDTO) {
-    return this.prisma.$transaction(async (tx) => {
-      const product = await tx.product.create({
-        data: {
-          name: dto.name,
-          image: `${this.configService.get('S3_PUBLIC_URL')}/cover.png`,
-          startAmount: dto.currentAmount,
-          currentAmount: dto.currentAmount,
-          targetAmount: dto.targetAmount,
-          distributionPercent: Number(dto.distributionPercent),
-          fundingEndDate: DateTime.fromISO(dto.fundingEndDate).toJSDate(),
-          marketEndDate: DateTime.now().toJSDate(),
-          user: {
-            connect: {
-              id: userId,
+    return this.prisma.$transaction(
+      async (tx) => {
+        const product = await tx.product.create({
+          data: {
+            name: dto.name,
+            image: `${this.configService.get('S3_PUBLIC_URL')}/cover.png`,
+            startAmount: dto.currentAmount,
+            currentAmount: dto.currentAmount,
+            targetAmount: dto.targetAmount,
+            distributionPercent: Number(dto.distributionPercent),
+            fundingEndDate: DateTime.fromISO(dto.fundingEndDate).toJSDate(),
+            marketEndDate: DateTime.now().toJSDate(),
+            user: {
+              connect: {
+                id: userId,
+              },
             },
-          },
-          categories: {
-            create: dto.category.map((category) => ({
-              category: {
-                connectOrCreate: {
-                  where: {
-                    name: category,
-                  },
-                  create: {
-                    name: category,
+            categories: {
+              create: dto.category.map((category) => ({
+                category: {
+                  connectOrCreate: {
+                    where: {
+                      name: category,
+                    },
+                    create: {
+                      name: category,
+                    },
                   },
                 },
-              },
-            })),
-          },
-        },
-      });
-
-      await tx.productDetailImage.create({
-        data: {
-          image: `${this.configService.get('S3_PUBLIC_URL')}/cover.png`,
-          index: 0,
-          product: {
-            connect: {
-              id: product.id,
+              })),
             },
           },
-        },
-      });
+        });
 
-      const address = await this.blockchain.create(
-        dto.name,
-        product.id.split('-')[0],
-        `${this.configService.get('S3_PUBLIC_URL')}/${product.id}/1.png`,
-      );
+        await tx.productDetailImage.create({
+          data: {
+            image: `${this.configService.get('S3_PUBLIC_URL')}/cover.png`,
+            index: 0,
+            product: {
+              connect: {
+                id: product.id,
+              },
+            },
+          },
+        });
 
-      console.log(address);
+        const address = await this.blockchain
+          .create(
+            dto.name,
+            product.id.split('-')[0],
+            `${this.configService.get('S3_PUBLIC_URL')}/${product.id}/1.png`,
+          )
+          .then((address) => {
+            console.log(address);
+            if (!address) throw new InternalServerErrorException('NFT 생성에 실패했습니다.');
 
-      await tx.product.update({
-        where: {
-          id: product.id,
-        },
-        data: {
-          tokenAddress: address,
-        },
-      });
+            return address;
+          });
 
-      return product;
-    });
+        await tx.product.update({
+          where: {
+            id: product.id,
+          },
+          data: {
+            tokenAddress: address,
+          },
+        });
+
+        return product;
+      },
+      {
+        timeout: 10000,
+      },
+    );
   }
 
   async updateProductType(userId: string, productId: string) {
