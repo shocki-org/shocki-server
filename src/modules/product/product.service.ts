@@ -255,48 +255,38 @@ export class ProductService {
           },
         },
       })
-      .then((product) => {
-        return {
-          ...product,
-          userFavorite: !!product.userFavorite.length,
-        };
-      })
-      .then((product) => {
-        return {
-          ...product,
-          categories: product.categories.map((category) => category.category.name),
-        };
-      })
-      .then((product) => {
-        return {
-          ...product,
-          detailImages: product.productDetailImage
-            .sort((a, b) => a.index - b.index)
-            .map((image) => image.image),
-        };
-      })
-      .then((product) => {
-        return {
-          ...product,
-          graph: product.fundingLog
-            .map((log, x) => ({
-              x,
-              y: log.price,
-            }))
-            .push({
-              x: product.fundingLog.length,
-              y: product.currentAmount,
-            }),
-        };
-      })
-      .then((product) => {
-        return {
-          ...product,
-          purchaseIsDisabled:
-            product.fundingEndDate < DateTime.now().toJSDate() &&
-            product.type === ProductType.FUNDING,
-        };
-      })
+      .then((product) => ({
+        ...product,
+        userFavorite: !!product.userFavorite.length,
+      }))
+      .then((product) => ({
+        ...product,
+        categories: product.categories.map((category) => category.category.name),
+      }))
+      .then((product) => ({
+        ...product,
+        detailImages: product.productDetailImage
+          .sort((a, b) => a.index - b.index)
+          .map((image) => image.image),
+      }))
+      .then((product) => ({
+        ...product,
+        graph: product.fundingLog
+          .map((log, x) => ({
+            x,
+            y: log.price,
+          }))
+          .push({
+            x: product.fundingLog.length,
+            y: product.currentAmount,
+          }),
+      }))
+      .then((product) => ({
+        ...product,
+        purchaseIsDisabled:
+          product.fundingEndDate < DateTime.now().toJSDate() &&
+          product.type === ProductType.FUNDING,
+      }))
       .then((product) => {
         if (!product.userTokenBalancesOnProduct.length) return product;
         return {
