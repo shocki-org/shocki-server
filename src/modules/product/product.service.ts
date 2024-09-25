@@ -630,6 +630,46 @@ export class ProductService {
     });
   }
 
+  async updateProductPrice(productId: string) {
+    const product = await this.prisma.product.findUnique({
+      select: {
+        type: true,
+        fundingEndDate: true,
+        tokenAddress: true,
+        startAmount: true,
+        fundingLog: {
+          select: {
+            type: true,
+          },
+        },
+      },
+      where: {
+        id: productId,
+      },
+    });
+    if (!product) throw new NotFoundException('상품을 찾을 수 없습니다.');
+    if (product.type !== ProductType.FUNDING)
+      throw new BadRequestException('펀딩 상품이 아닙니다.');
+    if (product.fundingEndDate < DateTime.now().toJSDate())
+      throw new BadRequestException('펀딩 기간이 종료되었습니다.');
+    if (!product.tokenAddress) throw new InternalServerErrorException('토큰 주소가 없습니다.');
+
+    const D = product.fundingLog.filter((log) => log.type === FundingType.DEPOSIT).length; // 매수 요청
+    const S = product.fundingLog.filter((log) => log.type === FundingType.WITHDRAW).length; // 매도 요청
+    const L = 1000 - (await this.blockchain.getRemainingTokens(product.tokenAddress)); // 시장에 풀린 토큰
+
+    const newPrice = product.startAmount * (1 + 0.05 * (D - S / S + L));
+
+    return this.prisma.product.update({
+      where: {
+        id: productId,
+      },
+      data: {
+        currentAmount: newPrice,
+      },
+    });
+  }
+
   async purchaseProductToken(userId: string, productId: string, amount: number) {
     const product = await this.prisma.product.findUnique({
       where: {
