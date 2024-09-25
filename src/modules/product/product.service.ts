@@ -278,10 +278,15 @@ export class ProductService {
       .then((product) => {
         return {
           ...product,
-          graph: product.fundingLog.map((log, x) => ({
-            x,
-            y: log.price,
-          })),
+          graph: product.fundingLog
+            .map((log, x) => ({
+              x,
+              y: log.price,
+            }))
+            .push({
+              x: product.fundingLog.length,
+              y: product.currentAmount,
+            }),
         };
       })
       .then((product) => {
