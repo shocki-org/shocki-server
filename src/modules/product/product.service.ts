@@ -581,57 +581,59 @@ export class ProductService {
     if (beforeTokenBalance.token <= newTokenBalance)
       throw new BadRequestException('토큰이 충분하지 않습니다.');
 
-    return this.prisma.$transaction(async (tx) => {
-      await tx.userTokenBalancesOnProduct.update({
-        where: {
-          id: beforeTokenBalance.id,
-        },
-        data: {
-          token: {
-            decrement: returnedToken,
+    return this.prisma
+      .$transaction(async (tx) => {
+        await tx.userTokenBalancesOnProduct.update({
+          where: {
+            id: beforeTokenBalance.id,
           },
-        },
-      });
+          data: {
+            token: {
+              decrement: returnedToken,
+            },
+          },
+        });
 
-      await tx.userAccount.update({
-        where: {
-          id: user.userAccount!.id,
-        },
-        data: {
-          credit: {
-            increment: returnedToken * product.currentAmount,
+        await tx.userAccount.update({
+          where: {
+            id: user.userAccount!.id,
           },
-        },
-      });
+          data: {
+            credit: {
+              increment: returnedToken * product.currentAmount,
+            },
+          },
+        });
 
-      await tx.product.update({
-        where: {
-          id: productId,
-        },
-        data: {
-          collectedAmount: {
-            decrement: returnedToken * product.currentAmount,
+        await tx.product.update({
+          where: {
+            id: productId,
           },
-          fundingLog: {
-            create: {
-              amount: returnedToken,
-              price: product.currentAmount,
-              type: FundingType.WITHDRAW,
-              userTokenBalance: {
-                connect: {
-                  id: beforeTokenBalance.id,
+          data: {
+            collectedAmount: {
+              decrement: returnedToken * product.currentAmount,
+            },
+            fundingLog: {
+              create: {
+                amount: returnedToken,
+                price: product.currentAmount,
+                type: FundingType.WITHDRAW,
+                userTokenBalance: {
+                  connect: {
+                    id: beforeTokenBalance.id,
+                  },
                 },
               },
             },
           },
-        },
-      });
+        });
 
-      return {
-        token: returnedToken,
-        credit: returnedToken * product.currentAmount,
-      };
-    });
+        return {
+          token: returnedToken,
+          credit: returnedToken * product.currentAmount,
+        };
+      })
+      .then(() => this.updateProductPrice(productId));
   }
 
   async updateProductPrice(productId: string) {
