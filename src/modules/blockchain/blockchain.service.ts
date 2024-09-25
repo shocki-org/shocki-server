@@ -80,7 +80,7 @@ export class BlockchainService {
     await erc20.waitForDeployment();
 
     await erc20.transfer(to, ethers.parseUnits(amount.toString(), 18), {
-      gasLimit: 1_000_000_000,
+      gasLimit: 3_000_000,
       nonce: await this.getTransactionCount(),
     });
 
