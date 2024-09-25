@@ -75,6 +75,8 @@ export class BlockchainService {
 
     await erc20.approve(this.deployer.address, ethers.parseUnits(amount.toString(), 18));
 
+    await erc20.wait();
+
     await erc20.transfer(to, ethers.parseUnits(amount.toString(), 18), {
       gasLimit: 100000,
     });
