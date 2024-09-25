@@ -292,9 +292,9 @@ export class ProductService {
       }))
       .then((product) => ({
         ...product,
-        purchaseIsDisabled:
-          product.fundingEndDate < DateTime.now().toJSDate() &&
-          product.type === ProductType.FUNDING,
+        purchaseIsDisabled: !(
+          product.fundingEndDate < DateTime.now().toJSDate() && product.type === ProductType.FUNDING
+        ),
       }))
       .then((product) => {
         if (!product.userTokenBalancesOnProduct.length) return product;
