@@ -666,6 +666,8 @@ export class ProductService {
 
     const newPrice = product.startAmount * (1 + 0.05 * (D - S / S + L));
 
+    console.log(newPrice);
+
     return this.prisma.product.update({
       where: {
         id: productId,
