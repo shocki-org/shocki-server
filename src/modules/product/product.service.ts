@@ -713,92 +713,97 @@ export class ProductService {
       throw new BadRequestException('잔액이 부족합니다.');
 
     return this.prisma
-      .$transaction(async (tx) => {
-        await tx.userAccount.update({
-          where: {
-            id: user.userAccount!.id,
-          },
-          data: {
-            credit: {
-              decrement: product.currentAmount * amount,
-            },
-          },
-        });
-
-        const userTokenBalance = await tx.userTokenBalancesOnProduct
-          .findFirstOrThrow({
+      .$transaction(
+        async (tx) => {
+          await tx.userAccount.update({
             where: {
-              AND: [
-                {
-                  productId,
-                },
-                {
-                  userAccountId: user.userAccount!.id,
-                },
-              ],
+              id: user.userAccount!.id,
             },
-          })
-          .catch(() =>
-            tx.userTokenBalancesOnProduct.create({
-              data: {
-                product: {
-                  connect: {
-                    id: productId,
+            data: {
+              credit: {
+                decrement: product.currentAmount * amount,
+              },
+            },
+          });
+
+          const userTokenBalance = await tx.userTokenBalancesOnProduct
+            .findFirstOrThrow({
+              where: {
+                AND: [
+                  {
+                    productId,
+                  },
+                  {
+                    userAccountId: user.userAccount!.id,
+                  },
+                ],
+              },
+            })
+            .catch(() =>
+              tx.userTokenBalancesOnProduct.create({
+                data: {
+                  product: {
+                    connect: {
+                      id: productId,
+                    },
+                  },
+                  userAccount: {
+                    connect: {
+                      id: user.userAccount!.id,
+                    },
                   },
                 },
-                userAccount: {
-                  connect: {
-                    id: user.userAccount!.id,
+              }),
+            );
+
+          await tx.userTokenBalancesOnProduct.update({
+            where: {
+              id: userTokenBalance.id,
+            },
+            data: {
+              token: {
+                increment: Number(amount),
+              },
+            },
+          });
+
+          await tx.product.update({
+            where: {
+              id: productId,
+            },
+            data: {
+              collectedAmount: {
+                increment: product.currentAmount * amount,
+              },
+              fundingLog: {
+                create: {
+                  amount: Number(amount),
+                  price: product.currentAmount,
+                  type: FundingType.DEPOSIT,
+                  userTokenBalance: {
+                    connect: {
+                      id: userTokenBalance.id,
+                    },
                   },
                 },
               },
-            }),
+            },
+          });
+
+          await this.blockchain.getRemainingTokens(product.tokenAddress!).then((remaining) => {
+            if (remaining < amount) throw new BadRequestException('남은 토큰이 부족합니다.');
+          });
+
+          await this.blockchain.transfer(
+            user.userAccount!.walletAddress!,
+            amount,
+            product.tokenAddress!,
           );
-
-        await tx.userTokenBalancesOnProduct.update({
-          where: {
-            id: userTokenBalance.id,
-          },
-          data: {
-            token: {
-              increment: Number(amount),
-            },
-          },
-        });
-
-        await tx.product.update({
-          where: {
-            id: productId,
-          },
-          data: {
-            collectedAmount: {
-              increment: product.currentAmount * amount,
-            },
-            fundingLog: {
-              create: {
-                amount: Number(amount),
-                price: product.currentAmount,
-                type: FundingType.DEPOSIT,
-                userTokenBalance: {
-                  connect: {
-                    id: userTokenBalance.id,
-                  },
-                },
-              },
-            },
-          },
-        });
-
-        await this.blockchain.getRemainingTokens(product.tokenAddress!).then((remaining) => {
-          if (remaining < amount) throw new BadRequestException('남은 토큰이 부족합니다.');
-        });
-
-        await this.blockchain.transfer(
-          user.userAccount!.walletAddress!,
-          amount,
-          product.tokenAddress!,
-        );
-      })
+        },
+        {
+          timeout: 10000,
+        },
+      )
       .then(() => this.updateProductPrice(productId));
   }
 }
