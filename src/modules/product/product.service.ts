@@ -283,6 +283,15 @@ export class ProductService {
       }))
       .then((product) => ({
         ...product,
+        graph: product.fundingLog.length === 0 && [
+          {
+            x: 0,
+            y: product.currentAmount,
+          },
+        ],
+      }))
+      .then((product) => ({
+        ...product,
         purchaseIsDisabled:
           product.fundingEndDate < DateTime.now().toJSDate() &&
           product.type === ProductType.FUNDING,
