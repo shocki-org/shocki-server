@@ -26,6 +26,7 @@ export class BlockchainService {
   // The imageURI is the image that we are going to use for the NFT
   // eg. All the image name should be 1.png and the imageURI should be the path to the image
   // eg. imageURI: 'https://ipfs.io/ipfs/QmZzv1Q2' and 1.png
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private async _createERC721(name: string, symbol: string, imageBaseURI: string): Promise<string> {
     const ShockiNFT = await ethers.getContractFactory('ShockiNFT');
     const erc721 = await ShockiNFT.deploy(name, symbol, {
@@ -83,9 +84,11 @@ export class BlockchainService {
 
     await tx.wait();
 
-    await erc20.transfer(to, ethers.parseUnits(amount.toString(), 18), {
+    const transfer = await erc20.transfer(to, ethers.parseUnits(amount.toString(), 18), {
       nonce: await this.getTransactionCount(),
     });
+
+    await transfer.wait();
 
     return;
   }
