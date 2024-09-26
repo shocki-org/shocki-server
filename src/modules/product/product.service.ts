@@ -271,33 +271,37 @@ export class ProductService {
       }))
       .then((product) => ({
         ...product,
-        graph: product.fundingLog
-          .map((log, x) => ({
+        graph: [
+          ...product.fundingLog.map((log, x) => ({
             x,
             y: log.price,
-          }))
-          .push({
-            x: product.fundingLog.length,
-            y: product.currentAmount,
-          }),
-      }))
-      .then((product) => ({
-        ...product,
-        graph: product.fundingLog.length === 0 && [
+          })),
           {
-            x: 0,
+            x: product.fundingLog.length,
             y: product.currentAmount,
           },
         ],
       }))
       .then((product) => ({
         ...product,
-        purchaseIsDisabled: !(
-          product.fundingEndDate < DateTime.now().toJSDate() && product.type === ProductType.FUNDING
-        ),
+        graph:
+          product.fundingLog.length === 0
+            ? [
+                {
+                  x: 0,
+                  y: product.currentAmount,
+                },
+              ]
+            : product.graph,
+      }))
+      .then((product) => ({
+        ...product,
+        purchaseIsDisabled:
+          product.fundingEndDate < DateTime.now().toJSDate() &&
+          product.type === ProductType.FUNDING,
       }))
       .then((product) => {
-        if (!product.userTokenBalancesOnProduct.length) return product;
+        if (!product.userTokenBalancesOnProduct.length) return { ...product, saleIsDisabled: true };
         return {
           ...product,
           saleIsDisabled:
@@ -309,6 +313,7 @@ export class ProductService {
         const copy: { [key: string]: any } = { ...product };
         delete copy['fundingLog'];
         delete copy['userTokenBalancesOnProduct'];
+        delete copy['productDetailImage'];
 
         return copy as unknown as GetProductDTO;
       })
