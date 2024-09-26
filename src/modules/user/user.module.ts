@@ -10,5 +10,6 @@ import { UserService } from './user.service';
   imports: [PrismaModule, BlockchainModule],
   controllers: [UserController],
   providers: [UserService],
+  exports: [UserService],
 })
 export class UserModule {}
