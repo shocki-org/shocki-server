@@ -192,17 +192,36 @@ export class ProductService {
 
     const url = await this.s3Service.uploadImage(key, dto.base64Image);
 
-    return this.prisma.productDetailImage.create({
-      data: {
-        image: url,
-        index: dto.index,
-        product: {
-          connect: {
-            id: dto.productId,
-          },
+    return this.prisma.productDetailImage
+      .findFirstOrThrow({
+        where: {
+          productId: dto.productId,
+          index: dto.index,
         },
-      },
-    });
+      })
+      .then((detail) =>
+        this.prisma.productDetailImage.update({
+          where: {
+            id: detail.id,
+          },
+          data: {
+            image: url,
+          },
+        }),
+      )
+      .catch(() =>
+        this.prisma.productDetailImage.create({
+          data: {
+            image: url,
+            index: dto.index,
+            product: {
+              connect: {
+                id: dto.productId,
+              },
+            },
+          },
+        }),
+      );
   }
 
   async getProduct(userId: string, productId: string): Promise<GetProductDTO> {
