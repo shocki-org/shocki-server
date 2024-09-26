@@ -29,6 +29,8 @@ export class BlockchainService {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private async _createERC721(name: string, symbol: string, imageBaseURI: string): Promise<string> {
     const ShockiNFT = await ethers.getContractFactory('ShockiNFT');
+    console.log('ERC721 COUNT', await this.getTransactionCount());
+
     const erc721 = await ShockiNFT.deploy(name, symbol, {
       nonce: await this.getTransactionCount(),
       gasLimit: 3000000,
@@ -46,6 +48,8 @@ export class BlockchainService {
 
   private async _createERC20(name: string, symbol: string, nftAddress: string): Promise<string> {
     const ShockiToken = await ethers.getContractFactory('ShockiToken');
+    console.log('ERC20 COUNT', await this.getTransactionCount());
+
     const erc20 = await ShockiToken.deploy(name, symbol, nftAddress, {
       nonce: await this.getTransactionCount(),
       gasLimit: 3000000,
