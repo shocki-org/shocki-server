@@ -28,7 +28,11 @@ export class ProductService {
       S3_PUBLIC_URL: string;
     }>,
   ) {
-    this.updateProductPrice('324fefab-fdd3-4a64-8a90-e6cb94b19b41');
+    this.getProducts('FUNDING').then((products) => {
+      products.forEach((product) => {
+        this.updateProductPrice(product.id);
+      });
+    });
   }
 
   async createProduct(userId: string, dto: CreateProductDTO) {
@@ -670,6 +674,7 @@ export class ProductService {
     const D = product.fundingLog.filter((log) => log.type === FundingType.DEPOSIT).length; // 매수 요청
     const S = product.fundingLog.filter((log) => log.type === FundingType.WITHDRAW).length; // 매도 요청
     const L = 1000 - (await this.blockchain.getRemainingTokens(product.tokenAddress)); // 시장에 풀린 토큰
+    if (L === 0) return;
 
     const newPrice = product.startAmount * (1 + 0.05 * ((D - S) / (S + L)));
 
