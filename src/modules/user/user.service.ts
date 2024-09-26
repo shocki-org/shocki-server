@@ -400,6 +400,8 @@ export class UserService {
         walletAddress,
       },
     });
+
+    this.blockchain.sendToEth(walletAddress, 0.001);
   }
 
   async updateCredit(id: string, credit: number) {
