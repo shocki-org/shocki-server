@@ -795,17 +795,15 @@ export class ProductService {
           await this.blockchain.getRemainingTokens(product.tokenAddress!).then((remaining) => {
             if (remaining < amount) throw new BadRequestException('남은 토큰이 부족합니다.');
           });
-
-          await this.blockchain.transfer(
-            user.userAccount!.walletAddress!,
-            amount,
-            product.tokenAddress!,
-          );
         },
         {
           timeout: 10000,
         },
       )
-      .then(() => this.updateProductPrice(productId));
+      .then(() =>
+        this.blockchain
+          .transfer(user.userAccount!.walletAddress!, amount, product.tokenAddress!)
+          .then(() => this.updateProductPrice(productId)),
+      );
   }
 }
