@@ -59,6 +59,16 @@ export class BlockchainService {
     return address;
   }
 
+  async sendToEth(address: string, amount: number): Promise<void> {
+    await this.deployer.sendTransaction({
+      to: address,
+      value: ethers.parseEther(amount.toString()),
+      nonce: await this.getTransactionCount(),
+    });
+
+    return;
+  }
+
   async getTransactionCount(): Promise<number> {
     return await this.provider.getTransactionCount(this.deployer.address);
   }
