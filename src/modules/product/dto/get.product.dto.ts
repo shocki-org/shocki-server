@@ -36,6 +36,11 @@ export class GetProductDTO extends ProductDTO {
     type: Boolean,
   })
   saleIsDisabled: boolean;
+
+  @ApiProperty({
+    description: '유저 토큰 보유량',
+  })
+  userTokenBalance: number;
 }
 
 export class GetProductsDTO extends PickType(ProductDTO, ['id', 'name', 'image', 'currentAmount']) {

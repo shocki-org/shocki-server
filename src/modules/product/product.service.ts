@@ -13,6 +13,7 @@ import { PrismaService } from 'src/common/modules/prisma/prisma.service';
 import { S3Service } from 'src/common/modules/s3/s3.service';
 
 import { BlockchainService } from '../blockchain/blockchain.service';
+import { UserService } from '../user/user.service';
 import { CreateProductDTO } from './dto/create.product.dto';
 import { CreateProductQnADTO } from './dto/create.qna.dto';
 import { GetProductDTO, GetProductsDTO } from './dto/get.product.dto';
@@ -24,6 +25,7 @@ export class ProductService {
     private readonly prisma: PrismaService,
     private readonly blockchain: BlockchainService,
     private readonly s3Service: S3Service,
+    private readonly userService: UserService,
     private readonly configService: ConfigService<{
       S3_PUBLIC_URL: string;
     }>,
@@ -204,6 +206,7 @@ export class ProductService {
   }
 
   async getProduct(userId: string, productId: string): Promise<GetProductDTO> {
+    this.userService.updateTokenBalancees(userId);
     return this.prisma.product
       .findFirstOrThrow({
         where: {
@@ -315,6 +318,12 @@ export class ProductService {
             product.type === ProductType.FUNDING,
         };
       })
+      .then((product) => ({
+        ...product,
+        userTokenBalance: product.userTokenBalancesOnProduct.length
+          ? product.userTokenBalancesOnProduct[0].token
+          : 0,
+      }))
       .then((product) => {
         const copy: { [key: string]: any } = { ...product };
         delete copy['fundingLog'];
