@@ -392,6 +392,14 @@ export class UserService {
   }
 
   async updateWalletAddress(id: string, walletAddress: string) {
+    const user = await this.prisma.userAccount.findUnique({
+      where: {
+        userId: id,
+      },
+    });
+
+    if (user?.walletAddress === walletAddress) return;
+
     await this.prisma.userAccount.update({
       where: {
         userId: id,
