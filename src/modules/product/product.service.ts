@@ -30,7 +30,7 @@ export class ProductService {
   ) {
     this.getProducts('FUNDING').then((products) => {
       products.forEach((product) => {
-        this.updateProductPrice(product.id);
+        this.updateProductPrice(product.id).then(() => console.log(`${product.id} updated price`));
       });
     });
   }
