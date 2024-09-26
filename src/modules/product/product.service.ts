@@ -27,7 +27,9 @@ export class ProductService {
     private readonly configService: ConfigService<{
       S3_PUBLIC_URL: string;
     }>,
-  ) {}
+  ) {
+    this.updateProductPrice('324fefab-fdd3-4a64-8a90-e6cb94b19b41');
+  }
 
   async createProduct(userId: string, dto: CreateProductDTO) {
     const product = await this.prisma.$transaction(
@@ -669,9 +671,7 @@ export class ProductService {
     const S = product.fundingLog.filter((log) => log.type === FundingType.WITHDRAW).length; // 매도 요청
     const L = 1000 - (await this.blockchain.getRemainingTokens(product.tokenAddress)); // 시장에 풀린 토큰
 
-    const newPrice = product.startAmount * (1 + 0.05 * (D - S / S + L));
-
-    console.log(newPrice);
+    const newPrice = product.startAmount * (1 + 0.05 * ((D - S) / (S + L)));
 
     return this.prisma.product.update({
       where: {
