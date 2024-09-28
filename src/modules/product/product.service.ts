@@ -8,6 +8,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 import { PrismaService } from 'src/common/modules/prisma/prisma.service';
 import { S3Service } from 'src/common/modules/s3/s3.service';
@@ -552,6 +553,29 @@ export class ProductService {
         },
       });
     });
+  }
+
+  @Cron(CronExpression.EVERY_MINUTE)
+  async authSale() {
+    const users = await this.prisma.user.findMany({
+      select: {
+        id: true,
+      },
+    });
+    const products = await this.prisma.product.findMany({
+      select: {
+        id: true,
+      },
+      where: {
+        type: ProductType.FUNDING,
+      },
+    });
+
+    for (const user of users) {
+      for (const product of products) {
+        await this.saleProductToken(user.id, product.id);
+      }
+    }
   }
 
   async saleProductToken(userId: string, productId: string) {

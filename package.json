@@ -34,6 +34,7 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/schedule": "^4.1.1",
     "@nestjs/swagger": "^7.4.0",
     "@nomicfoundation/hardhat-ignition": "^0.15.5",
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
